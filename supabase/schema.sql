@@ -48,14 +48,24 @@ create table if not exists public.presenteadores (
   telefone      text,
   descricao     text,            -- quando não é item da lista: "Vale R$ 1.000", "Pix", "Perfume"...
   valor         numeric(10,2),
-  status        text not null default 'reservado'
-                check (status in ('reservado', 'recebido', 'agradecido')),
+  status        text not null default 'reservado',
   origem        text not null default 'site' check (origem in ('site', 'manual')),
   observacao    text,
   token         uuid not null default gen_random_uuid(),  -- permite ao convidado cancelar a própria reserva
   criado_em     timestamptz not null default now(),
   atualizado_em timestamptz not null default now()
 );
+
+-- Comprovante do Pix / aprovação (também serve para quem já rodou a versão anterior do script)
+alter table public.presenteadores add column if not exists comprovante_path text;
+alter table public.presenteadores add column if not exists aprovado_em timestamptz;
+alter table public.presenteadores drop constraint if exists presenteadores_status_check;
+update public.presenteadores set status = 'comprado' where status = 'recebido';
+alter table public.presenteadores add constraint presenteadores_status_check
+  check (status in ('reservado', 'comprado', 'agradecido'));
+-- reservado  = convidado reservou pelo site (ou lançado no painel), aguardando pagamento
+-- comprado   = comprovante conferido e aprovado no painel → aparece como "já comprado" no site
+-- agradecido = já mandou o agradecimento
 
 -- Cada item da lista só pode ser reservado uma vez pelo site
 create unique index if not exists presenteadores_um_por_presente
@@ -94,18 +104,24 @@ create policy "admin gerencia presenteadores" on public.presenteadores
 -- Funções públicas usadas pela página
 -- ---------------------------------------------------------------------
 
--- Lista dos presentes ativos + nome de quem reservou (sem telefone/obs)
-create or replace function public.lista_publica()
+-- Lista dos presentes ativos + nome de quem reservou e se já foi comprado (sem telefone/obs/comprovante)
+drop function if exists public.lista_publica();
+create function public.lista_publica()
 returns table (
   id uuid, nome text, categoria text, preco numeric, foto_url text, link text,
-  ordem int, reservado_por text
+  ordem int, reservado_por text, comprado boolean
 )
 language sql stable security definer set search_path = public
 as $$
   select p.id, p.nome, p.categoria, p.preco, p.foto_url, p.link, p.ordem,
-         (select r.nome from public.presenteadores r
-           where r.presente_id = p.id order by r.criado_em limit 1)
+         r.nome, coalesce(r.status in ('comprado', 'agradecido'), false)
   from public.presentes p
+  left join lateral (
+    select x.nome, x.status from public.presenteadores x
+     where x.presente_id = p.id
+     order by (x.status <> 'reservado') desc, x.criado_em
+     limit 1
+  ) r on true
   where p.ativo
   order by p.ordem, p.criado_em;
 $$;
@@ -169,6 +185,24 @@ create policy "admin altera fotos" on storage.objects for update to authenticate
   using (bucket_id = 'presentes' and public.is_admin());
 create policy "admin apaga fotos"  on storage.objects for delete to authenticated
   using (bucket_id = 'presentes' and public.is_admin());
+
+-- Comprovantes do Pix (PRIVADO: só o admin vê, por link temporário)
+insert into storage.buckets (id, name, public)
+values ('comprovantes', 'comprovantes', false)
+on conflict (id) do update set public = false;
+
+drop policy if exists "admin ve comprovantes"     on storage.objects;
+drop policy if exists "admin envia comprovantes"  on storage.objects;
+drop policy if exists "admin altera comprovantes" on storage.objects;
+drop policy if exists "admin apaga comprovantes"  on storage.objects;
+create policy "admin ve comprovantes"     on storage.objects for select to authenticated
+  using (bucket_id = 'comprovantes' and public.is_admin());
+create policy "admin envia comprovantes"  on storage.objects for insert to authenticated
+  with check (bucket_id = 'comprovantes' and public.is_admin());
+create policy "admin altera comprovantes" on storage.objects for update to authenticated
+  using (bucket_id = 'comprovantes' and public.is_admin());
+create policy "admin apaga comprovantes"  on storage.objects for delete to authenticated
+  using (bucket_id = 'comprovantes' and public.is_admin());
 
 -- ---------------------------------------------------------------------
 -- Dados iniciais (os 3 presentes de exemplo — só entram se a tabela estiver vazia)

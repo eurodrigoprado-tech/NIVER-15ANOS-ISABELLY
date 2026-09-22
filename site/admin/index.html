@@ -64,7 +64,12 @@
   .item .acoes { justify-content: flex-end; }
   .selo { display: inline-block; font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: .14em; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
   .selo.reservado { background: var(--aviso-bg); color: var(--aviso); }
-  .selo.recebido { background: var(--azul-bg); color: var(--azul); }
+  .selo.comprado { background: var(--azul-bg); color: var(--azul); }
+  .comp { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
+  .comp .tem { font-size: 14px; color: var(--ok); }
+  .comp .nao { font-size: 14px; color: var(--suave); font-style: italic; }
+  button.aprovar { background: var(--ok); border-color: var(--ok); color: #fff; }
+  button.aprovar:hover { background: #22502b; border-color: #22502b; color: #fff; }
   .selo.agradecido { background: var(--ok-bg); color: var(--ok); }
   .selo.livre { background: #EFE7D6; color: var(--suave); }
   .barra { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
@@ -126,9 +131,10 @@
         <div class="linha2">
           <div class="campo"><label for="pValor">VALOR (R$)</label><input id="pValor" type="number" step="0.01" min="0" inputmode="decimal"></div>
           <div class="campo"><label for="pStatus">STATUS</label>
-            <select id="pStatus"><option value="reservado">Reservado</option><option value="recebido">Recebido</option><option value="agradecido">Agradecido</option></select>
+            <select id="pStatus"><option value="reservado">Reservado (aguardando)</option><option value="comprado">Comprado ✓ (aprovado)</option><option value="agradecido">Agradecido</option></select>
           </div>
         </div>
+        <div class="campo"><label for="pComp">COMPROVANTE DO PIX (imagem ou PDF)</label><input id="pComp" type="file" accept="image/*,application/pdf"><div class="obs" id="pCompAtual" style="font-size:14px;margin-top:4px"></div></div>
         <div class="campo"><label for="pObs">OBSERVAÇÃO</label><textarea id="pObs" maxlength="500"></textarea></div>
         <div class="acoes">
           <button class="pri" type="submit" id="btnSalvarPessoa">SALVAR</button>
@@ -143,14 +149,14 @@
           <select id="filtroStatus">
             <option value="">Todos os status</option>
             <option value="reservado">Reservado</option>
-            <option value="recebido">Recebido</option>
+            <option value="comprado">Comprado ✓</option>
             <option value="agradecido">Agradecido</option>
           </select>
           <button type="button" id="btnCsv">EXPORTAR CSV</button>
         </div>
         <div class="tabela-wrap">
           <table>
-            <thead><tr><th>NOME</th><th>PRESENTE</th><th>VALOR</th><th>STATUS</th><th>DATA</th><th></th></tr></thead>
+            <thead><tr><th>NOME</th><th>PRESENTE</th><th>VALOR</th><th>STATUS</th><th>COMPROVANTE</th><th>DATA</th><th></th></tr></thead>
             <tbody id="tbPessoas"></tbody>
           </table>
         </div>
@@ -192,6 +198,7 @@
   </section>
 </main>
 
+<input type="file" id="anexoLinha" accept="image/*,application/pdf" hidden>
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -205,7 +212,7 @@
 
   var sb = window.supabase.createClient(CFG.url, CFG.anonKey);
   var presentes = [], pessoas = [];
-  var STATUS = { reservado: 'Reservado', recebido: 'Recebido', agradecido: 'Agradecido' };
+  var STATUS = { reservado: 'Reservado', comprado: 'Comprado ✓', agradecido: 'Agradecido' };
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -252,7 +259,7 @@
     ]).then(function (res) {
       if (res[0].error || res[1].error) {
         var m = (res[0].error || res[1].error).message;
-        $('tbPessoas').innerHTML = '<tr><td colspan="6" class="vazio">Erro ao carregar: ' + esc(m) + '</td></tr>';
+        $('tbPessoas').innerHTML = '<tr><td colspan="7" class="vazio">Erro ao carregar: ' + esc(m) + '</td></tr>';
         return;
       }
       presentes = res[0].data; pessoas = res[1].data;
@@ -263,7 +270,7 @@
   function verificarAdmin() {
     sb.rpc('is_admin').then(function (r) {
       if (r.data === false) {
-        $('tbPessoas').innerHTML = '<tr><td colspan="6" class="vazio">Este e-mail não está na tabela <b>admins</b> do Supabase. Adicione-o para ver e editar os dados.</td></tr>';
+        $('tbPessoas').innerHTML = '<tr><td colspan="7" class="vazio">Este e-mail não está na tabela <b>admins</b> do Supabase. Adicione-o para ver e editar os dados.</td></tr>';
       }
     });
   }
@@ -365,7 +372,7 @@
 
   // ---------- Quem presenteou
   function renderResumo() {
-    var c = { reservado: 0, recebido: 0, agradecido: 0 }, total = 0;
+    var c = { reservado: 0, comprado: 0, agradecido: 0 }, total = 0;
     pessoas.forEach(function (p) {
       c[p.status]++;
       var v = p.valor != null ? Number(p.valor) : (function () { var g = presentes.find(function (x) { return x.id === p.presente_id; }); return g && g.preco != null ? Number(g.preco) : 0; })();
@@ -373,8 +380,8 @@
     });
     var livres = presentes.filter(function (g) { return g.ativo && !pessoas.some(function (p) { return p.presente_id === g.id; }); }).length;
     $('resumo').innerHTML = [
-      [pessoas.length, 'PESSOAS'], [c.reservado, 'RESERVADOS'], [c.recebido, 'RECEBIDOS'],
-      [c.agradecido, 'AGRADECIDOS'], [livres, 'ITENS DISPONÍVEIS'], [brl(total), 'VALOR RECEBIDO']
+      [pessoas.length, 'PESSOAS'], [c.reservado, 'AGUARDANDO APROVAÇÃO'], [c.comprado + c.agradecido, 'COMPRADOS (APROVADOS)'],
+      [c.agradecido, 'AGRADECIDOS'], [livres, 'ITENS DISPONÍVEIS'], [brl(total), 'VALOR APROVADO']
     ].map(function (k) { return '<div class="kpi"><div class="v">' + k[0] + '</div><div class="r">' + k[1] + '</div></div>'; }).join('');
   }
   function filtradas() {
@@ -388,7 +395,7 @@
   function renderPessoas() {
     renderResumo();
     var lista = filtradas();
-    if (!lista.length) { $('tbPessoas').innerHTML = '<tr><td colspan="6" class="vazio">' + (pessoas.length ? 'Nada encontrado.' : 'Ninguém reservou ainda.') + '</td></tr>'; return; }
+    if (!lista.length) { $('tbPessoas').innerHTML = '<tr><td colspan="7" class="vazio">' + (pessoas.length ? 'Nada encontrado.' : 'Ninguém reservou ainda.') + '</td></tr>'; return; }
     $('tbPessoas').innerHTML = lista.map(function (p) {
       var item = nomePresente(p.presente_id);
       var desc = [item, p.descricao].filter(Boolean).join(' — ') || '—';
@@ -400,7 +407,12 @@
         '<td>' + esc(desc) + (p.observacao ? '<div class="obs">' + esc(p.observacao) + '</div>' : '') + '</td>' +
         '<td style="white-space:nowrap">' + valor + '</td>' +
         '<td><select data-status="' + p.id + '">' + Object.keys(STATUS).map(function (s) { return '<option value="' + s + '"' + (s === p.status ? ' selected' : '') + '>' + STATUS[s] + '</option>'; }).join('') + '</select></td>' +
-        '<td style="white-space:nowrap;font-size:14px">' + data(p.criado_em) + '</td>' +
+        '<td><div class="comp">' +
+          (p.comprovante_path ? '<span class="tem">✓ anexado</span><button class="mini" data-ver="' + p.id + '">VER</button>' : '<span class="nao">sem comprovante</span>') +
+          '<button class="mini" data-anexar="' + p.id + '">' + (p.comprovante_path ? 'TROCAR' : 'ANEXAR') + '</button>' +
+          (p.status === 'reservado' ? '<button class="mini aprovar" data-aprovar="' + p.id + '">APROVAR</button>' : '') +
+        '</div></td>' +
+        '<td style="white-space:nowrap;font-size:14px">' + data(p.criado_em) + (p.aprovado_em ? '<br><span class="obs">aprovado ' + data(p.aprovado_em) + '</span>' : '') + '</td>' +
         '<td style="white-space:nowrap"><button class="mini" data-editar-p="' + p.id + '">EDITAR</button> <button class="mini perigo" data-apagar-p="' + p.id + '">×</button></td>' +
       '</tr>';
     }).join('');
@@ -411,26 +423,70 @@
   $('tbPessoas').addEventListener('change', function (e) {
     var s = e.target.closest('select[data-status]'); if (!s) return;
     s.disabled = true;
-    sb.from('presenteadores').update({ status: s.value }).eq('id', s.dataset.status).then(function (r) {
+    var mud = { status: s.value };
+    if (s.value === 'reservado') mud.aprovado_em = null;
+    else { var atual = pessoas.find(function (x) { return x.id === s.dataset.status; }); if (atual && !atual.aprovado_em) mud.aprovado_em = new Date().toISOString(); }
+    sb.from('presenteadores').update(mud).eq('id', s.dataset.status).then(function (r) {
       if (r.error) alert(r.error.message); carregarTudo();
     });
   });
+  var anexarPara = null;
+  $('anexoLinha').addEventListener('change', function () {
+    var f = this.files[0], id = anexarPara; this.value = '';
+    if (!f || !id) return;
+    enviarComprovante(id, f).then(carregarTudo).catch(function (err) { alert('Erro ao anexar: ' + (err.message || err)); });
+  });
   $('tbPessoas').addEventListener('click', function (e) {
     var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.anexar) { anexarPara = b.dataset.anexar; $('anexoLinha').click(); return; }
+    if (b.dataset.ver) {
+      var pv = pessoas.find(function (x) { return x.id === b.dataset.ver; });
+      var janela = window.open('', '_blank');
+      sb.storage.from('comprovantes').createSignedUrl(pv.comprovante_path, 300).then(function (r) {
+        if (r.error) { if (janela) janela.close(); alert(r.error.message); return; }
+        if (janela) janela.location = r.data.signedUrl; else location.href = r.data.signedUrl;
+      });
+      return;
+    }
+    if (b.dataset.aprovar) {
+      var pa = pessoas.find(function (x) { return x.id === b.dataset.aprovar; });
+      if (!pa.comprovante_path && !confirm('Aprovar ' + pa.nome + ' sem comprovante anexado?')) return;
+      b.disabled = true;
+      sb.from('presenteadores').update({ status: 'comprado', aprovado_em: new Date().toISOString() }).eq('id', pa.id)
+        .then(function (r) { if (r.error) alert(r.error.message); carregarTudo(); });
+      return;
+    }
     if (b.dataset.editarP) {
       var p = pessoas.find(function (x) { return x.id === b.dataset.editarP; });
       $('pId').value = p.id; $('pNome').value = p.nome; $('pTel').value = p.telefone || ''; $('pPresente').value = p.presente_id || '';
       $('pDesc').value = p.descricao || ''; $('pValor').value = p.valor == null ? '' : p.valor; $('pStatus').value = p.status; $('pObs').value = p.observacao || '';
+      $('pComp').value = ''; $('pCompAtual').textContent = p.comprovante_path ? 'Já tem comprovante anexado — escolha outro arquivo só se quiser trocar.' : '';
       $('tituloPessoa').textContent = 'EDITAR REGISTRO'; $('msgPessoa').textContent = '';
       $('formPessoa').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     if (b.dataset.apagarP) {
       var q = pessoas.find(function (x) { return x.id === b.dataset.apagarP; });
       if (!confirm('Excluir o registro de ' + q.nome + '? Se for uma reserva do site, o presente volta a ficar disponível.')) return;
-      sb.from('presenteadores').delete().eq('id', q.id).then(function (r) { if (r.error) alert(r.error.message); carregarTudo(); });
+      sb.from('presenteadores').delete().eq('id', q.id).then(function (r) {
+        if (r.error) { alert(r.error.message); return; }
+        if (q.comprovante_path) sb.storage.from('comprovantes').remove([q.comprovante_path]);
+        carregarTudo();
+      });
     }
   });
-  function limparPessoa() { $('formPessoa').reset(); $('pId').value = ''; $('tituloPessoa').textContent = 'LANÇAR PRESENTE'; $('msgPessoa').textContent = ''; }
+  function enviarComprovante(id, file) {
+    var ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    var caminho = id + '/' + Date.now() + '.' + ext;
+    var antigo = (pessoas.find(function (x) { return x.id === id; }) || {}).comprovante_path;
+    return sb.storage.from('comprovantes').upload(caminho, file, { contentType: file.type || undefined, upsert: false }).then(function (r) {
+      if (r.error) throw r.error;
+      return sb.from('presenteadores').update({ comprovante_path: caminho }).eq('id', id);
+    }).then(function (r) {
+      if (r.error) throw r.error;
+      if (antigo && antigo !== caminho) sb.storage.from('comprovantes').remove([antigo]);
+    });
+  }
+  function limparPessoa() { $('formPessoa').reset(); $('pId').value = ''; $('pCompAtual').textContent = ''; $('tituloPessoa').textContent = 'LANÇAR PRESENTE'; $('msgPessoa').textContent = ''; }
   $('btnLimparPessoa').addEventListener('click', limparPessoa);
   $('formPessoa').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -441,18 +497,27 @@
     if (!dados.nome) return;
     var id = $('pId').value, btn = $('btnSalvarPessoa');
     btn.disabled = true; $('msgPessoa').textContent = 'Salvando…';
-    var q = id ? sb.from('presenteadores').update(dados).eq('id', id) : sb.from('presenteadores').insert(Object.assign({ origem: 'manual' }, dados));
+    var antes = id ? pessoas.find(function (x) { return x.id === id; }) : null;
+    if (dados.status === 'reservado') dados.aprovado_em = null;
+    else if (!antes || !antes.aprovado_em) dados.aprovado_em = new Date().toISOString();
+    var arquivo = $('pComp').files[0];
+    var q = id ? sb.from('presenteadores').update(dados).eq('id', id).select('id').single()
+               : sb.from('presenteadores').insert(Object.assign({ origem: 'manual' }, dados)).select('id').single();
     q.then(function (r) {
-      if (r.error) { $('msgPessoa').textContent = 'Erro: ' + r.error.message; return; }
+      if (r.error) throw r.error;
+      return arquivo ? enviarComprovante(r.data.id, arquivo) : null;
+    }).then(function () {
       limparPessoa(); $('msgPessoa').textContent = 'Salvo ✓';
       return carregarTudo();
+    }).catch(function (err) {
+      $('msgPessoa').textContent = 'Erro: ' + (err.message || err);
     }).then(function () { btn.disabled = false; });
   });
 
   $('btnCsv').addEventListener('click', function () {
-    var linhas = [['Nome', 'WhatsApp', 'Item da lista', 'Descrição', 'Valor', 'Status', 'Origem', 'Observação', 'Data']];
+    var linhas = [['Nome', 'WhatsApp', 'Item da lista', 'Descrição', 'Valor', 'Status', 'Comprovante', 'Aprovado em', 'Origem', 'Observação', 'Data']];
     filtradas().forEach(function (p) {
-      linhas.push([p.nome, p.telefone, nomePresente(p.presente_id), p.descricao, p.valor, STATUS[p.status], p.origem, p.observacao, data(p.criado_em)]);
+      linhas.push([p.nome, p.telefone, nomePresente(p.presente_id), p.descricao, p.valor, STATUS[p.status], p.comprovante_path ? 'sim' : 'não', data(p.aprovado_em), p.origem, p.observacao, data(p.criado_em)]);
     });
     var csv = '﻿' + linhas.map(function (l) { return l.map(function (c) { return '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"'; }).join(';'); }).join('\n');
     var a = document.createElement('a');

@@ -129,6 +129,8 @@
   .btn-reservar:hover, .btn-reservar:focus-visible { border-color: #8C1F2C; background: #8C1F2C; color: #FBF6EA; }
   .reservado { margin-top: 10px; border-top: 1px solid #E0CDA4; padding-top: 11px; }
   .reservado .por { font-style: italic; font-size: 17px; color: #8C1F2C; }
+  .reservado .comprado { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600; letter-spacing: 0.18em; color: #7B5A2E; margin-bottom: 3px; }
+  .card.foi-comprado .ph { filter: saturate(.55); opacity: .8; }
   .reservado button { margin-top: 5px; font-family: 'Cormorant Garamond', serif; font-size: 14px; padding: 0; border: 0; background: none; color: #9A8163; cursor: pointer; text-decoration: underline; }
   .vazio { grid-column: 1 / -1; text-align: center; font-style: italic; font-size: 18px; color: #E4BFBF; padding: 20px 0; }
 
@@ -374,6 +376,7 @@
 
   var presentes = ONLINE ? [] : PRESENTES_LOCAIS.slice();
   var reservas = {};   // { idPresente: nome }
+  var comprados = {};  // { idPresente: true } — aprovado no painel
   var minhas = {};
   var filtro = 'todos';
   var modal = null;
@@ -400,8 +403,11 @@
     if (!ONLINE) return Promise.resolve();
     return rpc('lista_publica').then(function (lista) {
       presentes = lista || [];
-      reservas = {};
-      presentes.forEach(function (p) { if (p.reservado_por) reservas[p.id] = p.reservado_por; });
+      reservas = {}; comprados = {};
+      presentes.forEach(function (p) {
+        if (p.reservado_por) reservas[p.id] = p.reservado_por;
+        if (p.comprado) comprados[p.id] = true;
+      });
       // esquece reservas "minhas" que já não existem no banco
       Object.keys(minhas).forEach(function (id) { if (!reservas[id]) delete minhas[id]; });
       gravar(KEY_MINHAS, minhas);
@@ -446,7 +452,7 @@
 
   // ---- Lista de presentes
   var grade = document.getElementById('grade');
-  function podeCancelar(id) { return ONLINE ? !!minhas[id] : true; }
+  function podeCancelar(id) { return ONLINE ? !!minhas[id] && !comprados[id] : true; }
   function render() {
     if (!carregado) { grade.innerHTML = '<p class="vazio">Carregando a lista…</p>'; return; }
     var visiveis = presentes.filter(function (p) {
@@ -463,11 +469,13 @@
       var foto = fotoSrc
         ? '<img src="' + esc(fotoSrc) + '" alt="' + esc(p.nome) + '" loading="lazy">'
         : '<span>foto do presente</span>';
-      var acao = dono
+      var acao = comprados[p.id]
+        ? '<div class="reservado"><div class="comprado">✓ JÁ COMPRADO</div><div class="por">Presenteado por ' + esc(dono) + '</div></div>'
+        : dono
         ? '<div class="reservado"><div class="por">Reservado por ' + esc(dono) + '</div>' +
           (podeCancelar(p.id) ? '<button type="button" data-cancelar="' + esc(p.id) + '">cancelar reserva</button>' : '') + '</div>'
         : '<button type="button" class="btn-reservar" data-reservar="' + esc(p.id) + '">RESERVAR</button>';
-      return '<article class="card">' +
+      return '<article class="card' + (comprados[p.id] ? ' foi-comprado' : '') + '">' +
         '<div class="moldura"><div class="ph">' + foto + '</div></div>' +
         '<div class="corpo">' +
           '<div class="cat">' + esc(p.categoria || '') + '</div>' +
@@ -490,7 +498,7 @@
     if (!m) return;
     botao.disabled = true;
     rpc('cancelar_reserva', { p_id: m.id, p_token: m.token }).then(function (ok) {
-      if (!ok) alert('Essa reserva não pode mais ser cancelada pelo site (o presente já foi marcado como recebido).');
+      if (!ok) alert('Essa reserva não pode mais ser cancelada pelo site (o presente já foi aprovado como comprado).');
       delete minhas[id]; gravar(KEY_MINHAS, minhas);
       return carregar();
     }).catch(function () {
