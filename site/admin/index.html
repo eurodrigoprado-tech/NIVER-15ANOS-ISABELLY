@@ -118,6 +118,7 @@
 
 <!-- App -->
 <main class="caixa" id="telaApp" hidden>
+  <div id="avisoAdmin" hidden style="background:#F7E1E1;border:1px solid #D9A3A3;color:#6E1620;padding:12px 14px;margin-bottom:16px;font-size:16px"></div>
   <div class="abas" role="tablist">
     <button class="tab" role="tab" data-aba="presenteadores" aria-selected="true">QUEM PRESENTEOU</button>
     <button class="tab" role="tab" data-aba="presentes" aria-selected="false">PRESENTES DA LISTA</button>
@@ -236,7 +237,17 @@
     mostrar('telaLogin', !session);
     mostrar('telaApp', !!session);
     mostrar('topo', !!session);
-    if (session) { $('emailUser').textContent = session.user.email; carregarTudo(); }
+    if (session) {
+      $('emailUser').textContent = session.user.email;
+      sb.rpc('is_admin').then(function (r) {
+        var ok = r.data === true;
+        $('avisoAdmin').hidden = ok;
+        if (!ok) $('avisoAdmin').innerHTML = '<b>Sem permissão de administrador.</b> O e-mail <b>' + esc(session.user.email) +
+          '</b> não está na tabela <code>admins</code> do Supabase — por isso aparece "row-level security". No SQL Editor rode:<br><code>insert into public.admins (email) values (\'' + esc(session.user.email) + '\');</code><br>e depois recarregue esta página.' +
+          (r.error ? '<br><small>(' + esc(r.error.message) + ')</small>' : '');
+      });
+      carregarTudo();
+    }
   }
   sb.auth.getSession().then(function (r) { entrar(r.data.session); });
   sb.auth.onAuthStateChange(function (_e, session) { entrar(session); });
@@ -374,7 +385,7 @@
       ? reduzirImagem(arquivo).then(function (blob) {
           var caminho = Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
           return sb.storage.from('presentes').upload(caminho, blob, { contentType: 'image/jpeg', upsert: false }).then(function (r) {
-            if (r.error) throw r.error;
+            if (r.error) throw new Error('ao enviar a foto — ' + r.error.message);
             return sb.storage.from('presentes').getPublicUrl(caminho).data.publicUrl;
           });
         })
@@ -387,7 +398,7 @@
       var id = $('gId').value;
       return id ? sb.from('presentes').update(dados).eq('id', id) : sb.from('presentes').insert(dados);
     }).then(function (r) {
-      if (r.error) throw r.error;
+      if (r.error) throw new Error('ao salvar o presente — ' + r.error.message);
       limparPresente(); $('msgPresente').textContent = 'Salvo ✓';
       return carregarTudo();
     }).catch(function (err) {
