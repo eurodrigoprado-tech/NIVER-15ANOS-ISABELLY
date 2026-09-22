@@ -205,17 +205,6 @@ create policy "admin apaga comprovantes"  on storage.objects for delete to authe
   using (bucket_id = 'comprovantes' and public.is_admin());
 
 -- ---------------------------------------------------------------------
--- Dados iniciais (os 3 presentes de exemplo — só entram se a tabela estiver vazia)
--- ---------------------------------------------------------------------
-insert into public.presentes (nome, categoria, preco, ordem)
-select * from (values
-  ('Fone de ouvido bluetooth', 'TECNOLOGIA', 100.00, 1),
-  ('Kit de skincare facial',   'BELEZA',     100.00, 2),
-  ('Colar delicado folheado',  'ACESSÓRIOS',  80.00, 3)
-) v(nome, categoria, preco, ordem)
-where not exists (select 1 from public.presentes);
-
--- ---------------------------------------------------------------------
 -- >>> TROQUE PELO SEU E-MAIL (o mesmo que você vai criar em Authentication > Users)
 -- ---------------------------------------------------------------------
 insert into public.admins (email) values ('eurodrigoprado@gmail.com')

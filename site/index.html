@@ -385,12 +385,8 @@
   var CFG = window.SUPABASE_CONFIG || {};
   var ONLINE = !!(CFG.url && CFG.anonKey);
 
-  var PRESENTES_LOCAIS = [
-    { id: 'g01', nome: 'Fone de ouvido bluetooth', categoria: 'TECNOLOGIA', preco: 100 },
-    { id: 'g02', nome: 'Kit de skincare facial', categoria: 'BELEZA', preco: 100 },
-    { id: 'g03', nome: 'Colar delicado folheado', categoria: 'ACESSÓRIOS', preco: 80 },
-    { id: 'vale', nome: 'Vale-presente de R$ 1.000', categoria: 'VALE-PRESENTE', preco: 1000 }
-  ];
+  // Usado só se o Supabase não estiver configurado (os presentes reais são cadastrados no painel /admin)
+  var PRESENTES_LOCAIS = [];
   // O item com categoria VALE-PRESENTE vira o botão do vale (e não aparece na grade)
   function ehVale(p) { return String(p.categoria || '').trim().toUpperCase() === 'VALE-PRESENTE'; }
   var KEY = 'isabelly15_reservas_v1';       // modo local: { idPresente: nome }
