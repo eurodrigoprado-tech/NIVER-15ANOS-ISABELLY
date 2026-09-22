@@ -5,8 +5,8 @@ window.SUPABASE_CONFIG = {
 
   // Pagamento: depois de reservar, o convidado vê a chave Pix e o botão para mandar o comprovante.
   // Chave Pix: celular no formato '+5562999990000' · CPF/CNPJ só números · e-mail · ou chave aleatória
-  pixChave: '',
-  pixTitular: '',           // nome do dono da conta, como está no banco (ex.: 'Karollina Oliveira Bitencourt')
-  pixCidade: 'Goiania',     // cidade do recebedor (sem acento)
+  pixChave: '51bef32a-24a1-4cb4-a7e8-34ed2eab72a8',   // chave aleatória (Nubank)
+  pixTitular: 'Rodrigo Pereira dos Santos Prado',           // nome do dono da conta, como está no banco (ex.: 'Karollina Oliveira Bitencourt')
+  pixCidade: 'Sao Paulo',     // cidade do recebedor (sem acento)
   whatsappComprovante: ''   // ex.: '5562999990000' (com DDI 55 + DDD)
 };
