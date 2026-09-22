@@ -99,7 +99,11 @@
   .vale-acao .reservado { margin-top: 0; }
   .pix { text-align: center; }
   .pix .valor { font-family: 'Cinzel', serif; font-weight: 700; font-size: 30px; color: #8C1F2C; margin: 4px 0 14px; }
-  .pix .chave { font-family: ui-monospace, monospace; font-size: 15px; word-break: break-all; padding: 12px; border: 1px dashed #C9A863; background: #FFFBF1; color: #2B1A18; }
+  .pix .qr { width: 200px; height: 200px; margin: 0 auto 14px; padding: 8px; background: #FFFFFF; border: 1px solid #D8BC85; }
+  .pix .qr svg, .pix .qr img { display: block; width: 100%; height: 100%; }
+  .pix .rot-pix { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; color: #7B5A2E; margin-bottom: 6px; }
+  .pix .chave { font-family: ui-monospace, monospace; font-size: 11px; line-height: 1.4; word-break: break-all; padding: 10px; border: 1px dashed #C9A863; background: #FFFBF1; color: #2B1A18; max-height: 74px; overflow: auto; text-align: left; user-select: all; }
+  .modal { max-height: calc(100vh - 40px); overflow-y: auto; }
   .pix .titular { font-size: 16px; color: #6B534E; margin-top: 6px; }
   .pix .passo { font-size: 16px; line-height: 1.5; color: #4A322E; margin: 14px 0 0; }
   .pix .acoes { flex-direction: column; }
@@ -355,11 +359,13 @@
       <h3 id="modalNome"></h3>
       <div class="pix" id="passoPix" hidden>
         <div class="valor" id="pixValor"></div>
+        <div class="qr" id="pixQr" aria-label="QR Code do Pix"></div>
+        <div class="rot-pix">PIX COPIA E COLA</div>
         <div class="chave" id="pixChave"></div>
         <div class="titular" id="pixTitular"></div>
-        <p class="passo">Faça o Pix e envie o comprovante. Assim que for confirmado, o presente aparece como <b>já comprado</b>.</p>
+        <p class="passo">Abra o app do banco, escaneie o QR Code ou cole o código — o valor já vem preenchido. Depois envie o comprovante: assim que for confirmado, o presente aparece como <b>já comprado</b>.</p>
         <div class="acoes">
-          <button type="button" class="btn-confirmar" id="btnCopiarPix">COPIAR CHAVE PIX</button>
+          <button type="button" class="btn-confirmar" id="btnCopiarPix">COPIAR CÓDIGO PIX</button>
           <a class="btn-voltar" id="btnComprovante" target="_blank" rel="noopener" style="padding:13px 8px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.16em">ENVIAR COMPROVANTE</a>
           <button type="button" class="btn-voltar" id="btnConcluir">CONCLUIR</button>
         </div>
@@ -378,6 +384,8 @@
 </div>
 
 <script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script src="js/pix.js"></script>
 <script>
 (function () {
   'use strict';
@@ -619,23 +627,35 @@
   var formReserva = document.getElementById('formReserva');
   var passoPix = document.getElementById('passoPix');
   function mostrarPasso(pix) { passoPix.hidden = !pix; formReserva.hidden = pix; }
-  function abrirPix(p, nome) {
+  var codigoPix = '';
+  function abrirPix(p, nome, reservaId) {
     document.getElementById('modalRot').textContent = 'RESERVA FEITA · PAGAMENTO VIA PIX';
     document.getElementById('pixValor').textContent = formatarPreco(p.preco);
-    document.getElementById('pixChave').textContent = PIX;
-    document.getElementById('pixTitular').textContent = CFG.pixTitular || '';
+    codigoPix = window.gerarPix({
+      chave: PIX, nome: CFG.pixTitular, cidade: CFG.pixCidade || 'Goiania',
+      valor: Number(p.preco) > 0 ? Number(p.preco) : null,
+      txid: 'ISA15' + String(reservaId || '').replace(/-/g, '').slice(0, 20)
+    });
+    document.getElementById('pixChave').textContent = codigoPix;
+    var qrBox = document.getElementById('pixQr');
+    try {
+      var qr = window.qrcode(0, 'M'); qr.addData(codigoPix); qr.make();
+      qrBox.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+      qrBox.hidden = false;
+    } catch (e) { qrBox.hidden = true; }
+    document.getElementById('pixTitular').textContent = CFG.pixTitular ? 'Para: ' + CFG.pixTitular : '';
     var wpp = String(CFG.whatsappComprovante || '').replace(/\D/g, '');
     var bc = document.getElementById('btnComprovante');
     bc.hidden = !wpp;
     if (wpp) bc.href = 'https://wa.me/' + wpp + '?text=' + encodeURIComponent('Oi! Sou ' + nome + ' e fiz o Pix do presente "' + p.nome + '" (' + formatarPreco(p.preco) + ') da Isabelly. Segue o comprovante:');
-    document.getElementById('btnCopiarPix').textContent = 'COPIAR CHAVE PIX';
+    document.getElementById('btnCopiarPix').textContent = 'COPIAR CÓDIGO PIX';
     mostrarPasso(true);
   }
   document.getElementById('btnCopiarPix').addEventListener('click', function () {
     var b = this;
-    function ok() { b.textContent = 'CHAVE COPIADA ✓'; setTimeout(function () { b.textContent = 'COPIAR CHAVE PIX'; }, 2500); }
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(PIX).then(ok, function () { prompt('Copie a chave Pix:', PIX); });
-    else prompt('Copie a chave Pix:', PIX);
+    function ok() { b.textContent = 'CÓDIGO COPIADO ✓'; setTimeout(function () { b.textContent = 'COPIAR CÓDIGO PIX'; }, 2500); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(codigoPix).then(ok, function () { prompt('Copie o código Pix:', codigoPix); });
+    else prompt('Copie o código Pix:', codigoPix);
   });
   document.getElementById('btnConcluir').addEventListener('click', function () { fecharModal(); });
   function fecharModal() {
@@ -666,7 +686,7 @@
       var r = Array.isArray(res) ? res[0] : res;
       if (r) { minhas[id] = { id: r.id, token: r.token }; gravar(KEY_MINHAS, minhas); }
       var item = todos.find(function (x) { return x.id === id; });
-      if (PIX && item) abrirPix(item, n); else fecharModal();
+      if (PIX && item) abrirPix(item, n, r && r.id); else fecharModal();
       return carregar();
     }).catch(function (err) {
       var msg = String(err && err.message || '');
