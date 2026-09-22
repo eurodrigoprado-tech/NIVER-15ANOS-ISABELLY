@@ -22,7 +22,7 @@
   // chave: CPF/CNPJ só números, e-mail, "+5562999990000" para celular, ou chave aleatória
   window.gerarPix = function (o) {
     var txid = String(o.txid || '***').replace(/[^A-Za-z0-9]/g, '').slice(0, 25) || '***';
-    var conta = campo('00', 'br.gov.bcb.pix') + campo('01', String(o.chave).trim());
+    var conta = campo('00', 'BR.GOV.BCB.PIX') + campo('01', String(o.chave).trim());
     if (o.descricao) conta += campo('02', limpar(o.descricao, 40));
     var p = campo('00', '01') +
       campo('26', conta) +
@@ -30,7 +30,7 @@
       campo('53', '986') +
       (o.valor ? campo('54', Number(o.valor).toFixed(2)) : '') +
       campo('58', 'BR') +
-      campo('59', limpar(o.nome, 25).toUpperCase() || 'RECEBEDOR') +
+      campo('59', limpar(o.nome, 25) || 'Recebedor') +
       campo('60', limpar(o.cidade, 15).toUpperCase() || 'GOIANIA') +
       campo('62', campo('05', txid)) +
       '6304';
