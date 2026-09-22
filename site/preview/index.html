@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lista de Presentes · 15 anos da Isabelly</title>
+<meta name="robots" content="noindex, nofollow">
+<title>PRÉVIA · Lista de Presentes · 15 anos da Isabelly</title>
 <meta name="description" content="Lista de presentes e convite da festa de 15 anos da Isabelly Bitencourt — 03 de outubro de 2026, 21h, Tropical Village, Goiânia.">
 <meta name="theme-color" content="#6B131C">
 <meta property="og:title" content="Isabelly · 15 anos">
@@ -278,7 +279,7 @@
       <h1>Isabelly</h1>
       <div class="quinze">quinze anos</div>
 
-      <div class="foto"><img src="img/capa.jpg" alt="Isabelly" width="1400" height="1050"></div>
+      <div class="foto"><img src="../img/capa.jpg" alt="Isabelly" width="1400" height="1050"></div>
 
       <p class="abertura">Sua presença já é o maior presente. Mas se quiser deixar uma lembrança desse dia, separei algumas sugestões com carinho. Escolha uma e reserve — assim ninguém repete.</p>
 
@@ -358,7 +359,7 @@
         <div class="abs" style="inset:18px;border:1px solid rgba(193,154,75,0.7);pointer-events:none;z-index:3"></div>
         <div class="abs" style="inset:24px;border:1px solid rgba(193,154,75,0.3);pointer-events:none;z-index:3"></div>
 
-        <img class="abs" src="img/monograma.png" alt="Monograma IB" style="top:56px;left:236px;width:128px;height:133px;object-fit:contain">
+        <img class="abs" src="../img/monograma.png" alt="Monograma IB" style="top:56px;left:236px;width:128px;height:133px;object-fit:contain">
 
         <div class="abs linha cinzel" style="top:252px;font-size:12px;letter-spacing:0.3em;color:#7B5A2E">OS PAIS</div>
         <div class="abs cinzel" style="top:284px;left:50px;width:500px;text-align:center;font-size:13px;line-height:1.55;letter-spacing:0.02em;color:#2B1A18;text-wrap:pretty">KAROLLINA OLIVEIRA BITENCOURT E LÉO BITENCOURT DOS SANTOS, JUNTAMENTE COM A IRMÃ RAFAELLA OLIVEIRA BITENCOURT</div>
@@ -388,12 +389,12 @@
         <div class="abs linha corm" style="top:836px;font-size:23px;letter-spacing:0.03em;color:#2B1A18">All Black</div>
         <div class="abs" style="top:876px;left:0;width:600px;overflow:hidden">
           <div class="looks">
-            <div><img src="img/look1.jpg" alt="Traje All Black — look 1"></div>
-            <div><img src="img/look2.jpg" alt="Traje All Black — look 2"></div>
-            <div><img src="img/look3.jpg" alt="Traje All Black — look 3"></div>
-            <div aria-hidden="true"><img src="img/look1.jpg" alt=""></div>
-            <div aria-hidden="true"><img src="img/look2.jpg" alt=""></div>
-            <div aria-hidden="true"><img src="img/look3.jpg" alt=""></div>
+            <div><img src="../img/look1.jpg" alt="Traje All Black — look 1"></div>
+            <div><img src="../img/look2.jpg" alt="Traje All Black — look 2"></div>
+            <div><img src="../img/look3.jpg" alt="Traje All Black — look 3"></div>
+            <div aria-hidden="true"><img src="../img/look1.jpg" alt=""></div>
+            <div aria-hidden="true"><img src="../img/look2.jpg" alt=""></div>
+            <div aria-hidden="true"><img src="../img/look3.jpg" alt=""></div>
           </div>
         </div>
       </div>
@@ -441,9 +442,26 @@
   </div>
 </div>
 
-<script src="config.js"></script>
+<script src="../config.js"></script>
+<script>
+(function(){
+  var vendidos={100:7,150:0,300:23,600:50,800:2,900:11};
+  var db=[
+    {id:'g1',nome:'Kit de skincare facial',categoria:'BELEZA',preco:150,ordem:1,reservado_por:null,comprado:false,estoque:1,vendidos:0,disponiveis:1},
+    {id:'g2',nome:'Fone de ouvido bluetooth',categoria:'TECNOLOGIA',preco:100,ordem:2,reservado_por:'Tia Rosa',comprado:true,estoque:1,vendidos:1,disponiveis:0},
+    {id:'v1',nome:'Vale-presente',categoria:'VALE-PRESENTE',preco:1000,ordem:0,reservado_por:null,comprado:false,estoque:1,vendidos:0,disponiveis:1}
+  ];
+  [100,150,300,600,800,900].forEach(function(v,i){ db.push({id:'c'+v,nome:'Cartão-presente de R$ '+v,categoria:'CARTAO-PRESENTE',preco:v,ordem:900+i,reservado_por:null,comprado:false,estoque:50,vendidos:vendidos[v],disponiveis:50-vendidos[v]}); });
+  window.fetch=function(url,o){ var n=url.split('/rpc/')[1], b=o&&o.body?JSON.parse(o.body):{}, res=true;
+    if(n==='lista_publica') res=JSON.parse(JSON.stringify(db));
+    if(n==='reservar'){ var it=db.find(function(x){return x.id===b.p_presente}); it.vendidos++; it.disponiveis--; if(Number(it.estoque)===1) it.reservado_por=b.p_nome; res=[{id:'r'+Math.random().toString(36).slice(2,8),token:'tk'}]; }
+    return Promise.resolve({ok:true,json:function(){return Promise.resolve(res)}}); };
+})();
+</script>
+<div style="position:fixed;left:0;right:0;bottom:0;z-index:99;background:#E0C484;color:#5E1018;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;text-align:center;padding:9px 12px">PRÉVIA — NÚMEROS DE EXEMPLO, NADA AQUI É SALVO</div>
+
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-<script src="js/pix.js"></script>
+<script src="../js/pix.js"></script>
 <script>
 (function () {
   'use strict';
