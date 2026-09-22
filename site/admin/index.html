@@ -18,10 +18,10 @@
   body { margin: 0; min-height: 100vh; background: radial-gradient(120% 80% at 50% 0%, #8A1C26 0%, #6B131C 45%, #4A0C13 100%) fixed; color: var(--tinta); font: 17px/1.45 'Cormorant Garamond', Georgia, serif; padding: 0 16px 60px; }
   h1, h2, .cinzel, button, .tab, th, label { font-family: 'Cinzel', serif; }
   a { color: var(--vinho); }
-  .topo { max-width: 1080px; margin: 0 auto; padding: 28px 0 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: #F6E7C6; }
+  .topo { max-width: 1280px; margin: 0 auto; padding: 28px 0 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: #F6E7C6; }
   .topo h1 { margin: 0; font-size: 18px; font-weight: 500; letter-spacing: .2em; }
   .topo .quem { font-size: 15px; color: #E4BFBF; display: flex; gap: 12px; align-items: center; }
-  .caixa { max-width: 1080px; margin: 0 auto; background: linear-gradient(176deg, var(--creme), var(--creme2)); border-radius: 4px; box-shadow: 0 30px 70px rgba(20,2,6,.5); padding: 24px; }
+  .caixa { max-width: 1280px; margin: 0 auto; background: linear-gradient(176deg, var(--creme), var(--creme2)); border-radius: 4px; box-shadow: 0 30px 70px rgba(20,2,6,.5); padding: 24px; }
   .login { max-width: 380px; margin: 12vh auto 0; text-align: center; border-radius: 50% 50% 4px 4px / 12% 12% 0 0; padding: 48px 30px 32px; }
   .login h2 { font-size: 13px; letter-spacing: .24em; color: var(--rot); font-weight: 500; margin: 0 0 6px; }
   .login .nome { font-family: 'Pinyon Script', 'Cormorant Garamond', cursive; font-size: 30px; color: var(--vinho); font-style: italic; margin-bottom: 20px; }
@@ -45,10 +45,11 @@
   .kpi { background: var(--papel); border: 1px solid #E0CDA4; padding: 12px 14px; }
   .kpi .v { font-size: 30px; line-height: 1; color: var(--vinho); }
   .kpi .r { font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: .18em; color: var(--rot); margin-top: 6px; }
-  .grid2 { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
-  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+  .grid2 { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .grid2 > * { min-width: 0; }
+  @media (max-width: 1100px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
   .form { background: var(--papel); border: 1px solid #E0CDA4; padding: 18px; position: sticky; top: 16px; }
-  @media (max-width: 860px) { .form { position: static; } }
+  @media (max-width: 1100px) { .form { position: static; order: 2; } }
   .form h2 { font-size: 12px; letter-spacing: .2em; font-weight: 500; color: var(--rot); margin: 0 0 14px; }
   .linha2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -72,7 +73,8 @@
   .selo { display: inline-block; font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: .14em; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
   .selo.reservado { background: var(--aviso-bg); color: var(--aviso); }
   .selo.comprado { background: var(--azul-bg); color: var(--azul); }
-  .comp { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
+  .comp { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .comp .tem, .comp .nao { flex-basis: 100%; }
   .comp .tem { font-size: 14px; color: var(--ok); }
   .comp .nao { font-size: 14px; color: var(--suave); font-style: italic; }
   button.aprovar { background: var(--ok); border-color: var(--ok); color: #fff; }
@@ -80,14 +82,16 @@
   .selo.agradecido { background: var(--ok-bg); color: var(--ok); }
   .selo.livre { background: #EFE7D6; color: var(--suave); }
   .barra { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-  .barra input[type=search] { flex: 1; min-width: 180px; }
+  .barra input[type=search] { flex: 1 1 220px; min-width: 0; }
   .barra select { width: auto; }
   .tabela-wrap { overflow-x: auto; border: 1px solid #E0CDA4; background: var(--papel); }
   table { width: 100%; border-collapse: collapse; font-size: 16px; }
   th { font-size: 9.5px; letter-spacing: .16em; color: var(--rot); font-weight: 500; text-align: left; padding: 10px; border-bottom: 1px solid #E0CDA4; white-space: nowrap; }
   td { padding: 9px 10px; border-bottom: 1px solid #EFE4CC; vertical-align: top; }
   tr:last-child td { border-bottom: 0; }
-  td select { padding: 5px 8px; font-size: 15px; width: auto; }
+  td select { padding: 5px 8px; font-size: 15px; width: auto; max-width: 150px; }
+  .col-acoes { white-space: nowrap; text-align: right; }
+  .excluido { font-size: 13px; color: var(--suave); font-style: italic; }
   td .obs { font-size: 14px; color: var(--suave); font-style: italic; }
   .vazio { text-align: center; font-style: italic; color: var(--suave); padding: 24px; }
   [hidden] { display: none !important; }
@@ -139,7 +143,7 @@
         <div class="linha2">
           <div class="campo"><label for="pValor">VALOR (R$)</label><input id="pValor" type="number" step="0.01" min="0" inputmode="decimal"></div>
           <div class="campo"><label for="pStatus">STATUS</label>
-            <select id="pStatus"><option value="reservado">Reservado (aguardando)</option><option value="comprado">Comprado ✓ (aprovado)</option><option value="agradecido">Agradecido</option></select>
+            <select id="pStatus"><option value="reservado">Reservado</option><option value="comprado">Comprado ✓</option><option value="agradecido">Agradecido</option></select>
           </div>
         </div>
         <div class="campo"><label for="pComp">COMPROVANTE DO PIX (imagem ou PDF)</label><input id="pComp" type="file" accept="image/*,application/pdf"><div class="obs" id="pCompAtual" style="font-size:14px;margin-top:4px"></div></div>
@@ -354,8 +358,17 @@
     }
     if (b.dataset.apagarG) {
       var g = presentes.find(function (x) { return x.id === b.dataset.apagarG; });
-      if (!confirm('Excluir "' + g.nome + '"? Quem já reservou continua no controle, sem o vínculo com o item.\n\nDica: para só esconder do site, edite e desmarque "Aparece no site".')) return;
-      sb.from('presentes').delete().eq('id', g.id).then(function (r) { if (r.error) alert(r.error.message); carregarTudo(); });
+      if (!confirm('Excluir "' + g.nome + '"? Quem já reservou continua no controle, com o nome e o valor guardados.\n\nDica: para só esconder do site, edite e desmarque "Aparece no site".')) return;
+      // guarda nome e valor no histórico de quem presenteou antes de excluir o item
+      var ligados = pessoas.filter(function (x) { return x.presente_id === g.id; });
+      Promise.all(ligados.map(function (x) {
+        return sb.from('presenteadores').update({
+          descricao: x.descricao || g.nome,
+          valor: x.valor != null ? x.valor : g.preco
+        }).eq('id', x.id);
+      })).then(function () {
+        return sb.from('presentes').delete().eq('id', g.id);
+      }).then(function (r) { if (r && r.error) alert(r.error.message); carregarTudo(); });
     }
   });
 
@@ -438,13 +451,13 @@
     if (!lista.length) { $('tbPessoas').innerHTML = '<tr><td colspan="7" class="vazio">' + (pessoas.length ? 'Nada encontrado.' : 'Ninguém reservou ainda.') + '</td></tr>'; return; }
     $('tbPessoas').innerHTML = lista.map(function (p) {
       var item = nomePresente(p.presente_id);
-      var desc = [item, p.descricao].filter(Boolean).join(' — ') || '—';
+      var desc = [item, p.descricao].filter(Boolean).join(' — ') || (p.origem === 'site' ? '<span class="excluido">item removido da lista</span>' : '—');
       var valor = p.valor != null ? brl(p.valor) : (function () { var g = presentes.find(function (x) { return x.id === p.presente_id; }); return g ? brl(g.preco) : ''; })();
       var w = whats(p.telefone);
       return '<tr>' +
         '<td><b>' + esc(p.nome) + '</b>' + (p.telefone ? '<br><a href="' + w + '" target="_blank" rel="noopener">' + esc(p.telefone) + '</a>' : '') +
           (p.origem === 'manual' ? '<br><span class="obs">lançado no painel</span>' : '') + '</td>' +
-        '<td>' + esc(desc) + (p.observacao ? '<div class="obs">' + esc(p.observacao) + '</div>' : '') + '</td>' +
+        '<td>' + (desc.indexOf('<span') === 0 ? desc : esc(desc)) + (p.observacao ? '<div class="obs">' + esc(p.observacao) + '</div>' : '') + '</td>' +
         '<td style="white-space:nowrap">' + valor + '</td>' +
         '<td><select data-status="' + p.id + '">' + Object.keys(STATUS).map(function (s) { return '<option value="' + s + '"' + (s === p.status ? ' selected' : '') + '>' + STATUS[s] + '</option>'; }).join('') + '</select></td>' +
         '<td><div class="comp">' +
@@ -453,7 +466,7 @@
           (p.status === 'reservado' ? '<button class="mini aprovar" data-aprovar="' + p.id + '">APROVAR</button>' : '') +
         '</div></td>' +
         '<td style="white-space:nowrap;font-size:14px">' + data(p.criado_em) + (p.aprovado_em ? '<br><span class="obs">aprovado ' + data(p.aprovado_em) + '</span>' : '') + '</td>' +
-        '<td style="white-space:nowrap"><button class="mini" data-editar-p="' + p.id + '">EDITAR</button> <button class="mini perigo" data-apagar-p="' + p.id + '">×</button></td>' +
+        '<td class="col-acoes"><button class="mini" data-editar-p="' + p.id + '">EDITAR</button> <button class="mini perigo" data-apagar-p="' + p.id + '">×</button></td>' +
       '</tr>';
     }).join('');
   }
