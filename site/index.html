@@ -296,6 +296,7 @@
       <button class="filtro" data-f="todos" aria-pressed="true">TODOS</button>
       <button class="filtro" data-f="disponiveis" aria-pressed="false">DISPONÍVEIS</button>
       <button class="filtro" data-f="reservados" aria-pressed="false">JÁ RESERVADOS</button>
+      <button class="filtro" data-f="comprados" aria-pressed="false">JÁ COMPRADOS</button>
     </nav>
   </div>
 
@@ -556,11 +557,14 @@
     renderVale();
     if (!carregado) { grade.innerHTML = '<p class="vazio">Carregando a lista…</p>'; return; }
     var visiveis = presentes.filter(function (p) {
-      var r = !!reservas[p.id];
-      return filtro === 'todos' ? true : filtro === 'disponiveis' ? !r : r;
+      var r = !!reservas[p.id], c = !!comprados[p.id];
+      if (filtro === 'disponiveis') return !r;
+      if (filtro === 'reservados') return r && !c;   // reservado, aguardando confirmação do pagamento
+      if (filtro === 'comprados') return c;
+      return true;
     });
     if (!visiveis.length) {
-      grade.innerHTML = '<p class="vazio">' + (filtro === 'reservados' ? 'Nenhum presente reservado ainda.' : filtro === 'disponiveis' ? 'Todos os presentes já foram reservados.' : 'A lista ainda está sendo preparada.') + '</p>';
+      grade.innerHTML = '<p class="vazio">' + (filtro === 'reservados' ? 'Nenhum presente aguardando pagamento.' : filtro === 'comprados' ? 'Nenhum presente comprado ainda.' : filtro === 'disponiveis' ? 'Todos os presentes já foram reservados.' : 'A lista ainda está sendo preparada.') + '</p>';
       return;
     }
     grade.innerHTML = visiveis.map(function (p) {
