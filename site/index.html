@@ -183,6 +183,8 @@
   .btn-confirmar { border: 1px solid #8C1F2C; background: #8C1F2C; color: #FBF6EA; }
   .btn-confirmar:hover { background: #5E1018; border-color: #5E1018; }
   .btn-confirmar:disabled { opacity: .5; cursor: not-allowed; }
+  .modal .erro { margin: 12px 0 0; font-style: italic; font-size: 16px; color: #8C1F2C; }
+  .modal input[hidden] { display: none; }
 
   @media (prefers-reduced-motion: reduce) {
     .looks { animation-duration: 60s; }
@@ -329,7 +331,7 @@
   <footer class="rodape">
     <div class="orn claro"><div class="l"></div><div class="d"></div><div class="r"></div></div>
     <p class="obrigada">OBRIGADA POR FAZER PARTE<br>DESSE DIA COMIGO</p>
-    <p class="nota">As reservas ficam salvas neste aparelho.</p>
+    <p class="nota" id="notaRodape">As reservas ficam salvas neste aparelho.</p>
   </footer>
 
   <!-- 1.5 Modal -->
@@ -340,6 +342,8 @@
       <h3 id="modalNome"></h3>
       <form id="formReserva">
         <input id="inputNome" type="text" placeholder="Seu nome" autocomplete="name" maxlength="60">
+        <input id="inputTel" type="tel" placeholder="WhatsApp (opcional)" autocomplete="tel" maxlength="20" style="margin-top:10px">
+        <p class="erro" id="erroModal" role="alert" hidden></p>
         <div class="acoes">
           <button type="button" class="btn-voltar" id="btnVoltar">VOLTAR</button>
           <button type="submit" class="btn-confirmar" id="btnConfirmar" disabled>CONFIRMAR</button>
@@ -349,31 +353,70 @@
   </div>
 </div>
 
+<script src="config.js"></script>
 <script>
 (function () {
   'use strict';
 
-  // Presentes — troque/adicione itens aqui. "foto" é opcional (ex.: 'img/presentes/fone.jpg').
-  var PRESENTES = [
-    { id: 'g01', nome: 'Fone de ouvido bluetooth', categoria: 'TECNOLOGIA', preco: 'R$ 100' },
-    { id: 'g02', nome: 'Kit de skincare facial', categoria: 'BELEZA', preco: 'R$ 100' },
-    { id: 'g03', nome: 'Colar delicado folheado', categoria: 'ACESSÓRIOS', preco: 'R$ 80' }
+  // Com Supabase configurado (config.js), a lista e as reservas vêm do banco e são compartilhadas.
+  // Sem configuração, usa a lista abaixo e salva as reservas só neste aparelho.
+  var CFG = window.SUPABASE_CONFIG || {};
+  var ONLINE = !!(CFG.url && CFG.anonKey);
+
+  var PRESENTES_LOCAIS = [
+    { id: 'g01', nome: 'Fone de ouvido bluetooth', categoria: 'TECNOLOGIA', preco: 100 },
+    { id: 'g02', nome: 'Kit de skincare facial', categoria: 'BELEZA', preco: 100 },
+    { id: 'g03', nome: 'Colar delicado folheado', categoria: 'ACESSÓRIOS', preco: 80 }
   ];
-  var KEY = 'isabelly15_reservas_v1';
+  var KEY = 'isabelly15_reservas_v1';       // modo local: { idPresente: nome }
+  var KEY_MINHAS = 'isabelly15_minhas_v1';  // modo online: { idPresente: { id, token } }
   var ALVO = new Date('2026-10-03T21:00:00-03:00').getTime();
 
-  var reservas = {};
+  var presentes = ONLINE ? [] : PRESENTES_LOCAIS.slice();
+  var reservas = {};   // { idPresente: nome }
+  var minhas = {};
   var filtro = 'todos';
   var modal = null;
+  var carregado = !ONLINE;
 
-  try {
-    var raw = localStorage.getItem(KEY);
-    if (raw) reservas = JSON.parse(raw) || {};
-  } catch (e) {}
+  function ler(k) { try { return JSON.parse(localStorage.getItem(k) || '{}') || {}; } catch (e) { return {}; } }
+  function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  if (ONLINE) minhas = ler(KEY_MINHAS); else reservas = ler(KEY);
 
-  function salvar() {
-    try { localStorage.setItem(KEY, JSON.stringify(reservas)); } catch (e) {}
-    render();
+  function rpc(nome, corpo) {
+    return fetch(CFG.url.replace(/\/$/, '') + '/rest/v1/rpc/' + nome, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: CFG.anonKey, Authorization: 'Bearer ' + CFG.anonKey },
+      body: JSON.stringify(corpo || {})
+    }).then(function (r) {
+      return r.json().catch(function () { return null; }).then(function (d) {
+        if (!r.ok) { var err = new Error((d && d.message) || 'erro'); throw err; }
+        return d;
+      });
+    });
+  }
+
+  function carregar() {
+    if (!ONLINE) return Promise.resolve();
+    return rpc('lista_publica').then(function (lista) {
+      presentes = lista || [];
+      reservas = {};
+      presentes.forEach(function (p) { if (p.reservado_por) reservas[p.id] = p.reservado_por; });
+      // esquece reservas "minhas" que já não existem no banco
+      Object.keys(minhas).forEach(function (id) { if (!reservas[id]) delete minhas[id]; });
+      gravar(KEY_MINHAS, minhas);
+      carregado = true;
+      render();
+    }).catch(function () {
+      if (!carregado) { grade.innerHTML = '<p class="vazio">Não foi possível carregar a lista agora. Tente recarregar a página.</p>'; }
+    });
+  }
+
+  function formatarPreco(v) {
+    if (v === null || v === undefined || v === '') return '';
+    if (typeof v === 'string' && isNaN(Number(v))) return v;
+    var n = Number(v);
+    return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
   }
 
   function esc(s) {
@@ -403,30 +446,33 @@
 
   // ---- Lista de presentes
   var grade = document.getElementById('grade');
+  function podeCancelar(id) { return ONLINE ? !!minhas[id] : true; }
   function render() {
-    var visiveis = PRESENTES.filter(function (p) {
+    if (!carregado) { grade.innerHTML = '<p class="vazio">Carregando a lista…</p>'; return; }
+    var visiveis = presentes.filter(function (p) {
       var r = !!reservas[p.id];
       return filtro === 'todos' ? true : filtro === 'disponiveis' ? !r : r;
     });
     if (!visiveis.length) {
-      grade.innerHTML = '<p class="vazio">' + (filtro === 'reservados' ? 'Nenhum presente reservado ainda.' : 'Todos os presentes já foram reservados.') + '</p>';
+      grade.innerHTML = '<p class="vazio">' + (filtro === 'reservados' ? 'Nenhum presente reservado ainda.' : filtro === 'disponiveis' ? 'Todos os presentes já foram reservados.' : 'A lista ainda está sendo preparada.') + '</p>';
       return;
     }
     grade.innerHTML = visiveis.map(function (p) {
       var dono = reservas[p.id];
-      var foto = p.foto
-        ? '<img src="' + esc(p.foto) + '" alt="' + esc(p.nome) + '" loading="lazy">'
+      var fotoSrc = p.foto_url || p.foto;
+      var foto = fotoSrc
+        ? '<img src="' + esc(fotoSrc) + '" alt="' + esc(p.nome) + '" loading="lazy">'
         : '<span>foto do presente</span>';
       var acao = dono
         ? '<div class="reservado"><div class="por">Reservado por ' + esc(dono) + '</div>' +
-          '<button type="button" data-cancelar="' + p.id + '">cancelar reserva</button></div>'
-        : '<button type="button" class="btn-reservar" data-reservar="' + p.id + '">RESERVAR</button>';
+          (podeCancelar(p.id) ? '<button type="button" data-cancelar="' + esc(p.id) + '">cancelar reserva</button>' : '') + '</div>'
+        : '<button type="button" class="btn-reservar" data-reservar="' + esc(p.id) + '">RESERVAR</button>';
       return '<article class="card">' +
         '<div class="moldura"><div class="ph">' + foto + '</div></div>' +
         '<div class="corpo">' +
-          '<div class="cat">' + esc(p.categoria) + '</div>' +
+          '<div class="cat">' + esc(p.categoria || '') + '</div>' +
           '<h3>' + esc(p.nome) + '</h3>' +
-          '<div class="preco">' + esc(p.preco) + '</div>' +
+          '<div class="preco">' + esc(formatarPreco(p.preco)) + '</div>' +
           '<div class="espaco"></div>' + acao +
         '</div></article>';
     }).join('');
@@ -435,8 +481,23 @@
     var b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.reservar) abrirModal(b.dataset.reservar);
-    if (b.dataset.cancelar) { delete reservas[b.dataset.cancelar]; salvar(); }
+    if (b.dataset.cancelar) cancelar(b.dataset.cancelar, b);
   });
+
+  function cancelar(id, botao) {
+    if (!ONLINE) { delete reservas[id]; gravar(KEY, reservas); render(); return; }
+    var m = minhas[id];
+    if (!m) return;
+    botao.disabled = true;
+    rpc('cancelar_reserva', { p_id: m.id, p_token: m.token }).then(function (ok) {
+      if (!ok) alert('Essa reserva não pode mais ser cancelada pelo site (o presente já foi marcado como recebido).');
+      delete minhas[id]; gravar(KEY_MINHAS, minhas);
+      return carregar();
+    }).catch(function () {
+      botao.disabled = false;
+      alert('Não foi possível cancelar agora. Tente de novo.');
+    });
+  }
 
   document.getElementById('filtros').addEventListener('click', function (e) {
     var b = e.target.closest('.filtro');
@@ -449,16 +510,22 @@
   // ---- Modal
   var overlay = document.getElementById('overlay');
   var input = document.getElementById('inputNome');
+  var inputTel = document.getElementById('inputTel');
+  var erroModal = document.getElementById('erroModal');
   var btnConfirmar = document.getElementById('btnConfirmar');
   var ultimoFoco = null;
+  if (!ONLINE) inputTel.hidden = true;
   function abrirModal(id) {
-    var p = PRESENTES.find(function (x) { return x.id === id; });
+    var p = presentes.find(function (x) { return x.id === id; });
     if (!p) return;
     modal = id;
     ultimoFoco = document.activeElement;
     document.getElementById('modalNome').textContent = p.nome;
     input.value = '';
+    inputTel.value = '';
+    erroModal.hidden = true;
     btnConfirmar.disabled = true;
+    btnConfirmar.textContent = 'CONFIRMAR';
     overlay.hidden = false;
     setTimeout(function () { input.focus(); }, 30);
   }
@@ -475,10 +542,39 @@
     e.preventDefault();
     var n = input.value.trim();
     if (!n || !modal) return;
-    reservas[modal] = n;
-    fecharModal();
-    salvar();
+    if (!ONLINE) {
+      reservas[modal] = n;
+      gravar(KEY, reservas);
+      fecharModal();
+      render();
+      return;
+    }
+    var id = modal;
+    btnConfirmar.disabled = true;
+    btnConfirmar.textContent = 'SALVANDO…';
+    rpc('reservar', { p_presente: id, p_nome: n, p_telefone: inputTel.value.trim() || null }).then(function (res) {
+      var r = Array.isArray(res) ? res[0] : res;
+      if (r) { minhas[id] = { id: r.id, token: r.token }; gravar(KEY_MINHAS, minhas); }
+      fecharModal();
+      return carregar();
+    }).catch(function (err) {
+      var msg = String(err && err.message || '');
+      erroModal.textContent = msg.indexOf('ja_reservado') >= 0
+        ? 'Poxa, alguém acabou de reservar este presente. Escolha outro?'
+        : 'Não foi possível reservar agora. Tente de novo.';
+      erroModal.hidden = false;
+      btnConfirmar.disabled = false;
+      btnConfirmar.textContent = 'CONFIRMAR';
+      if (msg.indexOf('ja_reservado') >= 0) carregar();
+    });
   });
+
+  if (ONLINE) {
+    document.getElementById('notaRodape').textContent = 'Cada presente pode ser reservado uma única vez.';
+    carregar();
+    setInterval(function () { if (!document.hidden && !modal) carregar(); }, 30000);
+    document.addEventListener('visibilitychange', function () { if (!document.hidden && !modal) carregar(); });
+  }
 
   // ---- Escala responsiva do vale e do convite
   function escalar(medidor, alvo, larg, alt, folga) {
