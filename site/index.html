@@ -108,6 +108,13 @@
   .pix .passo { font-size: 16px; line-height: 1.5; color: #4A322E; margin: 14px 0 0; }
   .pix .acoes { flex-direction: column; }
   .pix .acoes a, .pix .acoes button { display: block; text-align: center; text-decoration: none; }
+  .pix .acoes [hidden] { display: none !important; }
+  .pix .btn-comp { border-color: #8C1F2C !important; color: #8C1F2C !important; }
+  .pix .btn-comp:hover { background: #8C1F2C !important; color: #FBF6EA !important; }
+  .pix .comp-status { margin: 2px 0 0; font-style: italic; font-size: 16px; color: #8C1F2C; }
+  .pix .comp-status.ok { color: #2F6B3A; }
+  .reservado .minha { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .reservado .enviado { font-size: 14px; color: #2F6B3A; font-style: italic; margin-top: 3px; }
 
   /* 1.4 Lista */
   .orn-secao { padding: 46px 0 26px; gap: 16px; }
@@ -366,7 +373,9 @@
         <p class="passo">Abra o app do banco, escaneie o QR Code ou cole o código — o valor já vem preenchido. Depois envie o comprovante: assim que for confirmado, o presente aparece como <b>já comprado</b>.</p>
         <div class="acoes">
           <button type="button" class="btn-confirmar" id="btnCopiarPix">COPIAR CÓDIGO PIX</button>
-          <a class="btn-voltar" id="btnComprovante" target="_blank" rel="noopener" style="padding:13px 8px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.16em">ENVIAR COMPROVANTE</a>
+          <button type="button" class="btn-voltar btn-comp" id="btnComprovante">ENVIAR COMPROVANTE</button>
+          <input type="file" id="arquivoComprovante" accept="image/*,application/pdf" hidden>
+          <p class="comp-status" id="compStatus" role="status" hidden></p>
           <button type="button" class="btn-voltar" id="btnConcluir">CONCLUIR</button>
         </div>
       </div>
@@ -485,6 +494,13 @@
 
   // ---- Lista de presentes
   var grade = document.getElementById('grade');
+  function acoesMinhas(id) {
+    if (!podeCancelar(id)) return '';
+    var m = minhas[id] || {};
+    var pagar = ONLINE && PIX ? '<button type="button" data-pagar="' + esc(id) + '">' + (m.comprovante ? 'ver Pix' : 'pagar / enviar comprovante') + '</button>' : '';
+    return (m.comprovante ? '<div class="enviado">✓ comprovante enviado — aguardando confirmação</div>' : '') +
+      '<div class="minha">' + pagar + '<button type="button" data-cancelar="' + esc(id) + '">cancelar reserva</button></div>';
+  }
   function podeCancelar(id) { return ONLINE ? !!minhas[id] && !comprados[id] : true; }
   var valeAcao = document.getElementById('valeAcao');
   function porExtenso(n) {
@@ -526,14 +542,14 @@
     valeAcao.innerHTML = comprados[vale.id]
       ? '<div class="reservado"><div class="comprado">✓ JÁ PRESENTEADO</div><div class="por">por ' + esc(dono) + '</div></div>'
       : dono
-      ? '<div class="reservado"><div class="por">Reservado por ' + esc(dono) + '</div>' +
-          (podeCancelar(vale.id) ? '<button type="button" data-cancelar="' + esc(vale.id) + '">cancelar reserva</button>' : '') + '</div>'
+      ? '<div class="reservado"><div class="por">Reservado por ' + esc(dono) + '</div>' + acoesMinhas(vale.id) + '</div>'
       : '<button type="button" class="btn-reservar" data-reservar="' + esc(vale.id) + '">RESERVAR E PAGAR</button>';
   }
   valeAcao.addEventListener('click', function (e) {
     var b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.reservar) abrirModal(b.dataset.reservar);
+    if (b.dataset.pagar) abrirPagamento(b.dataset.pagar);
     if (b.dataset.cancelar) cancelar(b.dataset.cancelar, b);
   });
   function render() {
@@ -556,8 +572,7 @@
       var acao = comprados[p.id]
         ? '<div class="reservado"><div class="comprado">✓ JÁ COMPRADO</div><div class="por">Presenteado por ' + esc(dono) + '</div></div>'
         : dono
-        ? '<div class="reservado"><div class="por">Reservado por ' + esc(dono) + '</div>' +
-          (podeCancelar(p.id) ? '<button type="button" data-cancelar="' + esc(p.id) + '">cancelar reserva</button>' : '') + '</div>'
+        ? '<div class="reservado"><div class="por">Reservado por ' + esc(dono) + '</div>' + acoesMinhas(p.id) + '</div>'
         : '<button type="button" class="btn-reservar" data-reservar="' + esc(p.id) + '">RESERVAR</button>';
       return '<article class="card' + (comprados[p.id] ? ' foi-comprado' : '') + '">' +
         '<div class="moldura"><div class="ph">' + foto + '</div></div>' +
@@ -573,6 +588,7 @@
     var b = e.target.closest('button');
     if (!b) return;
     if (b.dataset.reservar) abrirModal(b.dataset.reservar);
+    if (b.dataset.pagar) abrirPagamento(b.dataset.pagar);
     if (b.dataset.cancelar) cancelar(b.dataset.cancelar, b);
   });
 
@@ -628,6 +644,51 @@
   var passoPix = document.getElementById('passoPix');
   function mostrarPasso(pix) { passoPix.hidden = !pix; formReserva.hidden = pix; }
   var codigoPix = '';
+  var pixAtual = null;
+  var compStatus = document.getElementById('compStatus');
+  var arquivoComp = document.getElementById('arquivoComprovante');
+  function statusComp(txt, ok) { compStatus.hidden = !txt; compStatus.textContent = txt; compStatus.className = 'comp-status' + (ok ? ' ok' : ''); }
+  function abrirPagamento(id) {
+    var p = todos.find(function (x) { return x.id === id; });
+    if (!p) return;
+    modal = id;
+    ultimoFoco = document.activeElement;
+    document.getElementById('modalNome').textContent = p.nome;
+    abrirPix(p, reservas[id] || '', (minhas[id] || {}).id);
+    overlay.hidden = false;
+  }
+  document.getElementById('btnComprovante').addEventListener('click', function () { arquivoComp.click(); });
+  arquivoComp.addEventListener('change', function () {
+    var f = this.files[0]; this.value = '';
+    if (!f || !pixAtual) return;
+    var id = pixAtual.presenteId, m = minhas[id];
+    if (!m || !m.id || !m.token) return;
+    if (f.size > 10 * 1024 * 1024) { statusComp('Arquivo muito grande (máx. 10 MB). Tente um print da tela.', false); return; }
+    var btn = document.getElementById('btnComprovante');
+    btn.disabled = true; btn.textContent = 'ENVIANDO…'; statusComp('', false);
+    var ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+    var caminho = m.id + '/convidado-' + Date.now() + '.' + ext;
+    var base = CFG.url.replace(/\/$/, '');
+    fetch(base + '/storage/v1/object/comprovantes/' + caminho, {
+      method: 'POST',
+      headers: { apikey: CFG.anonKey, Authorization: 'Bearer ' + CFG.anonKey, 'Content-Type': f.type || 'application/octet-stream', 'x-upsert': 'false' },
+      body: f
+    }).then(function (r) {
+      if (!r.ok) return r.json().catch(function () { return {}; }).then(function (d) { throw new Error(d.message || d.error || 'upload'); });
+      return rpc('anexar_comprovante', { p_id: m.id, p_token: m.token, p_path: caminho });
+    }).then(function (ok) {
+      if (!ok) throw new Error('reserva');
+      m.comprovante = true; gravar(KEY_MINHAS, minhas);
+      btn.textContent = 'ENVIAR OUTRO COMPROVANTE';
+      statusComp('Comprovante enviado ✓ — assim que for confirmado, o presente aparece como já comprado.', true);
+      render();
+    }).catch(function (err) {
+      btn.textContent = 'ENVIAR COMPROVANTE';
+      statusComp(String(err.message).indexOf('reserva') >= 0
+        ? 'Esta reserva já foi confirmada ou cancelada.'
+        : 'Não foi possível enviar agora. Tente de novo (foto ou PDF, até 10 MB).', false);
+    }).then(function () { btn.disabled = false; });
+  });
   function abrirPix(p, nome, reservaId) {
     document.getElementById('modalRot').textContent = 'RESERVA FEITA · PAGAMENTO VIA PIX';
     document.getElementById('pixValor').textContent = formatarPreco(p.preco);
@@ -644,10 +705,13 @@
       qrBox.hidden = false;
     } catch (e) { qrBox.hidden = true; }
     document.getElementById('pixTitular').textContent = CFG.pixTitular ? 'Para: ' + CFG.pixTitular : '';
-    var wpp = String(CFG.whatsappComprovante || '').replace(/\D/g, '');
+    pixAtual = { presenteId: p.id };
+    var m = minhas[p.id];
     var bc = document.getElementById('btnComprovante');
-    bc.hidden = !wpp;
-    if (wpp) bc.href = 'https://wa.me/' + wpp + '?text=' + encodeURIComponent('Oi! Sou ' + nome + ' e fiz o Pix do presente "' + p.nome + '" (' + formatarPreco(p.preco) + ') da Isabelly. Segue o comprovante:');
+    bc.hidden = !(ONLINE && m && m.id && m.token);
+    bc.disabled = false;
+    bc.textContent = m && m.comprovante ? 'ENVIAR OUTRO COMPROVANTE' : 'ENVIAR COMPROVANTE';
+    statusComp(m && m.comprovante ? 'Comprovante enviado ✓ — aguardando confirmação.' : '', true);
     document.getElementById('btnCopiarPix').textContent = 'COPIAR CÓDIGO PIX';
     mostrarPasso(true);
   }
