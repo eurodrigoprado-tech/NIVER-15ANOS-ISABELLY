@@ -55,6 +55,12 @@
   .foto-prev { width: 100%; aspect-ratio: 4/3; object-fit: cover; border: 1px solid var(--borda); margin-top: 8px; display: block; background: repeating-linear-gradient(135deg,#F0E4CB 0 8px,#F8F0DF 8px 16px); }
   .check { display: flex; align-items: center; gap: 8px; font-size: 16px; }
   .check input { width: auto; }
+  .master-box { align-items: flex-start; background: #F7EBCF; border: 1px solid #E0C484; padding: 10px 12px; margin-bottom: 14px; font-family: 'Cormorant Garamond', serif; letter-spacing: 0; color: var(--tinta); font-size: 16px; cursor: pointer; }
+  .master-box b { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: .16em; color: var(--vinho); font-weight: 600; }
+  .master-box small { font-size: 14px; color: var(--suave); }
+  .master-box input { margin-top: 3px; }
+  .item.master { border-color: #C9A863; background: #FBF1DA; }
+  .selo.master { background: var(--vinho); color: var(--creme); }
   .lista-p { display: grid; gap: 10px; }
   .item { display: grid; grid-template-columns: 76px 1fr auto; gap: 14px; align-items: center; background: var(--papel); border: 1px solid #E0CDA4; padding: 10px; }
   .item.inativo { opacity: .55; }
@@ -170,6 +176,7 @@
       <form class="form" id="formPresente">
         <h2 id="tituloPresente">NOVO PRESENTE</h2>
         <input type="hidden" id="gId">
+        <label class="check master-box"><input type="checkbox" id="gMaster"> <span><b>PRESENTE MASTER</b><br><small>O vale em destaque no bilhete do topo da página (só um).</small></span></label>
         <div class="campo"><label for="gNome">NOME *</label><input id="gNome" maxlength="120" required></div>
         <div class="linha2">
           <div class="campo"><label for="gCat">CATEGORIA</label><input id="gCat" maxlength="30" placeholder="BELEZA" list="categorias"></div>
@@ -277,17 +284,30 @@
   function nomePresente(id) { var p = presentes.find(function (x) { return x.id === id; }); return p ? p.nome : ''; }
 
   // ---------- Presentes
+  var MASTER = 'VALE-PRESENTE';
+  function ehMaster(p) { return String(p.categoria || '').trim().toUpperCase() === MASTER; }
+  function atualizarMasterUI() {
+    var m = $('gMaster').checked;
+    $('gCat').disabled = m;
+    if (m) $('gCat').value = MASTER; else if ($('gCat').value === MASTER) $('gCat').value = '';
+  }
+  $('gMaster').addEventListener('change', function () {
+    if (this.checked && !$('gNome').value.trim()) $('gNome').value = 'Vale-presente';
+    atualizarMasterUI();
+  });
   function renderPresentes() {
     var cats = {};
-    presentes.forEach(function (p) { if (p.categoria) cats[p.categoria] = 1; });
+    presentes.forEach(function (p) { if (p.categoria && !ehMaster(p)) cats[p.categoria] = 1; });
     $('categorias').innerHTML = Object.keys(cats).map(function (c) { return '<option value="' + esc(c) + '">'; }).join('');
     if (!presentes.length) { $('listaPresentes').innerHTML = '<p class="vazio">Nenhum presente cadastrado ainda.</p>'; return; }
-    $('listaPresentes').innerHTML = presentes.map(function (p) {
+    var ordenados = presentes.filter(ehMaster).concat(presentes.filter(function (p) { return !ehMaster(p); }));
+    $('listaPresentes').innerHTML = ordenados.map(function (p) {
       var r = pessoas.find(function (x) { return x.presente_id === p.id; });
       var selo = r ? '<span class="selo ' + r.status + '">' + STATUS[r.status].toUpperCase() + ' · ' + esc(r.nome) + '</span>' : '<span class="selo livre">DISPONÍVEL</span>';
-      return '<div class="item' + (p.ativo ? '' : ' inativo') + '">' +
+      var m = ehMaster(p);
+      return '<div class="item' + (p.ativo ? '' : ' inativo') + (m ? ' master' : '') + '">' +
         (p.foto_url ? '<img src="' + esc(p.foto_url) + '" alt="">' : '<div class="sem"></div>') +
-        '<div><div class="s">' + esc(p.categoria) + (p.ativo ? '' : ' · oculto') + '</div><div class="n">' + esc(p.nome) + '</div>' +
+        '<div><div class="s">' + (m ? '<span class="selo master">★ PRESENTE MASTER</span>' : esc(p.categoria)) + (p.ativo ? '' : ' · oculto') + '</div><div class="n">' + esc(p.nome) + '</div>' +
           '<div class="s">' + brl(p.preco) + ' · ordem ' + p.ordem + '</div><div style="margin-top:4px">' + selo + '</div></div>' +
         '<div class="acoes"><button class="mini" data-editar-g="' + p.id + '">EDITAR</button>' +
           '<button class="mini perigo" data-apagar-g="' + p.id + '">EXCLUIR</button></div>' +
@@ -301,7 +321,7 @@
     $('pPresente').value = atual;
   }
   function limparPresente() {
-    $('formPresente').reset(); $('gId').value = ''; $('gFotoUrl').value = ''; $('gAtivo').checked = true;
+    $('formPresente').reset(); $('gId').value = ''; $('gFotoUrl').value = ''; $('gAtivo').checked = true; $('gMaster').checked = false; atualizarMasterUI();
     $('gOrdem').value = presentes.length ? Math.max.apply(null, presentes.map(function (p) { return p.ordem; })) + 1 : 1;
     $('gFotoPrev').hidden = true; $('tituloPresente').textContent = 'NOVO PRESENTE'; $('msgPresente').textContent = '';
   }
@@ -315,7 +335,7 @@
     if (b.dataset.editarG) {
       var p = presentes.find(function (x) { return x.id === b.dataset.editarG; });
       $('gId').value = p.id; $('gNome').value = p.nome; $('gCat').value = p.categoria; $('gPreco').value = p.preco == null ? '' : p.preco;
-      $('gLink').value = p.link || ''; $('gOrdem').value = p.ordem; $('gAtivo').checked = p.ativo; $('gFotoUrl').value = p.foto_url || ''; $('gFoto').value = '';
+      $('gLink').value = p.link || ''; $('gOrdem').value = p.ordem; $('gAtivo').checked = p.ativo; $('gMaster').checked = ehMaster(p); atualizarMasterUI(); $('gFotoUrl').value = p.foto_url || ''; $('gFoto').value = '';
       $('gFotoPrev').hidden = !p.foto_url; if (p.foto_url) $('gFotoPrev').src = p.foto_url;
       $('tituloPresente').textContent = 'EDITAR PRESENTE'; $('msgPresente').textContent = '';
       $('formPresente').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -343,6 +363,11 @@
 
   $('formPresente').addEventListener('submit', function (e) {
     e.preventDefault();
+    if ($('gMaster').checked) {
+      var outro = presentes.find(function (p) { return ehMaster(p) && p.id !== $('gId').value; });
+      if (outro) { $('msgPresente').textContent = 'Já existe um presente master ("' + outro.nome + '"). Edite esse ou desmarque ele antes.'; return; }
+      if (!num($('gPreco').value)) { $('msgPresente').textContent = 'Informe o valor do presente master (ex.: 1000).'; return; }
+    }
     var btn = $('btnSalvarPresente'); btn.disabled = true; $('msgPresente').textContent = 'Salvando…';
     var arquivo = $('gFoto').files[0];
     var subir = arquivo
@@ -356,7 +381,7 @@
       : Promise.resolve($('gFotoUrl').value || null);
     subir.then(function (fotoUrl) {
       var dados = {
-        nome: $('gNome').value.trim(), categoria: $('gCat').value.trim().toUpperCase(), preco: num($('gPreco').value),
+        nome: $('gNome').value.trim(), categoria: $('gMaster').checked ? MASTER : $('gCat').value.trim().toUpperCase(), preco: num($('gPreco').value),
         link: $('gLink').value.trim() || null, ordem: parseInt($('gOrdem').value, 10) || 0, ativo: $('gAtivo').checked, foto_url: fotoUrl
       };
       var id = $('gId').value;
