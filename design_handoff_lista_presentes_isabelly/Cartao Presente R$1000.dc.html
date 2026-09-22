@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #5E1018; }
+  a { color: #E0C484; }
+  a:hover { color: #F6E7C6; }
+  * { box-sizing: border-box; }
+</style>
+</helmet>
+<div style="min-height:100vh;background:radial-gradient(120% 80% at 50% 0%,#8A1C26 0%,#6B131C 45%,#4A0C13 100%);background-attachment:fixed;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 16px;gap:34px;font-family:'Cormorant Garamond',Georgia,serif">
+
+  <div ref="{{ refMedidor }}" style="width:100%;max-width:741px;display:flex;justify-content:center">
+    <div style="{{ estiloEscala }}">
+      <div onMouseMove="{{ aoMover }}" onMouseLeave="{{ aoSair }}" style="{{ estiloTilt }}">
+        <div style="{{ estiloCartao }}">
+
+          <div style="position:absolute;inset:0;background:linear-gradient(150deg,#FDF8EC 0%,#F6EDDA 42%,#EFE2C8 100%)"></div>
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(193,154,75,0.055) 0 2px,transparent 2px 6px)"></div>
+          <div style="position:absolute;inset:0;background:radial-gradient(70% 90% at 78% 18%,rgba(255,255,255,0.75) 0%,rgba(255,255,255,0) 60%)"></div>
+
+          <div style="position:absolute;left:562px;top:0;width:2px;height:425px;background:repeating-linear-gradient(to bottom,rgba(140,31,44,0.4) 0 9px,transparent 9px 18px)"></div>
+
+          <div style="position:absolute;left:562px;top:0;width:179px;height:425px;background:linear-gradient(180deg,rgba(140,31,44,0.07),rgba(140,31,44,0.02))"></div>
+
+          <div style="position:absolute;left:32px;top:24px;width:498px;height:377px;border:1px solid rgba(193,154,75,0.75)"></div>
+          <div style="position:absolute;left:37px;top:29px;width:488px;height:367px;border:1px solid rgba(193,154,75,0.35)"></div>
+
+          <div style="position:absolute;left:64px;top:52px;width:434px;display:flex;align-items:center;gap:12px">
+            <div style="height:1px;flex:1;background:linear-gradient(to right,transparent,#C19A4B)"></div>
+            <div style="width:6px;height:6px;transform:rotate(45deg);background:#C19A4B"></div>
+            <div style="height:1px;flex:1;background:linear-gradient(to left,transparent,#C19A4B)"></div>
+          </div>
+
+          <div style="position:absolute;left:64px;top:76px;width:434px;text-align:center;font-family:'Cinzel',serif;font-size:17px;font-weight:500;letter-spacing:0.3em;color:#7B5A2E">VALE-PRESENTE</div>
+
+          <div style="position:absolute;left:52px;top:112px;width:458px;text-align:center;font-family:'Cinzel',serif;font-weight:700;font-size:56px;line-height:1;color:#8C1F2C;letter-spacing:0;white-space:nowrap">{{ valor }}</div>
+
+          <div style="position:absolute;left:64px;top:180px;width:434px;text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:#5A4030">{{ valorExtenso }}</div>
+
+          <div style="position:absolute;left:150px;top:216px;width:262px;display:flex;align-items:center;gap:12px">
+            <div style="height:1px;flex:1;background:linear-gradient(to right,transparent,#C19A4B)"></div>
+            <div style="width:5px;height:5px;transform:rotate(45deg);background:#C19A4B"></div>
+            <div style="height:1px;flex:1;background:linear-gradient(to left,transparent,#C19A4B)"></div>
+          </div>
+
+          <div style="position:absolute;left:64px;top:244px;width:434px;text-align:center;font-family:'Cinzel',serif;font-size:26px;font-weight:600;letter-spacing:0.12em;color:#2B1A18">ISABELLY</div>
+          <div style="position:absolute;left:64px;top:284px;width:434px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:19px;letter-spacing:0.1em;color:#6B534E">FESTA DE 15 ANOS</div>
+
+          <div style="position:absolute;left:64px;top:350px;width:434px;display:flex;justify-content:space-between;align-items:flex-end;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.16em;color:#7B5A2E">
+            <div>{{ codigo }}</div>
+            <div>{{ dataValidade }}</div>
+          </div>
+
+          <div style="position:absolute;left:562px;top:0;width:179px;height:425px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">
+            <div style="width:7px;height:7px;transform:rotate(45deg);background:#C19A4B"></div>
+            <div style="writing-mode:vertical-rl;font-family:'Cinzel',serif;font-weight:600;font-size:40px;letter-spacing:0.18em;color:#8C1F2C">PRESENTE</div>
+            <div style="width:7px;height:7px;transform:rotate(45deg);background:#C19A4B"></div>
+          </div>
+          <div style="position:absolute;left:562px;top:22px;width:179px;text-align:center;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.22em;color:#7B5A2E">CANHOTO</div>
+          <div style="position:absolute;left:562px;bottom:22px;width:179px;text-align:center;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.22em;color:#7B5A2E">{{ valorCurto }}</div>
+
+          <div ref="{{ refBrilho }}" style="position:absolute;inset:0;pointer-events:none;transition:background 420ms ease-out"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="max-width:460px;text-align:center;font-size:18px;line-height:1.6;color:#F0D9AD;margin:0">Entregue o cartão inteiro e guarde o canhoto. O valor pode ser usado em qualquer item da lista de presentes.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:840,&quot;height&quot;:620},&quot;valor&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;R$ 1.000,00&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Valor&quot;},&quot;valorCurto&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;R$ 1.000&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Valor&quot;},&quot;valorExtenso&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;mil reais&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Valor&quot;},&quot;codigo&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Nº 001&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Cartão&quot;},&quot;dataValidade&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;VÁLIDO ATÉ A FESTA&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Cartão&quot;}}">
+const W = 741, H = 425, R = 25, N = 21, P = 562;
+
+const CLIP = [
+  `M ${R} 0`,
+  `L ${P - N} 0`,
+  `A ${N} ${N} 0 0 0 ${P + N} 0`,
+  `L ${W - R} 0`,
+  `A ${R} ${R} 0 0 1 ${W} ${R}`,
+  `L ${W} ${H - R}`,
+  `A ${R} ${R} 0 0 1 ${W - R} ${H}`,
+  `L ${P + N} ${H}`,
+  `A ${N} ${N} 0 0 0 ${P - N} ${H}`,
+  `L ${R} ${H}`,
+  `A ${R} ${R} 0 0 1 0 ${H - R}`,
+  `L 0 ${R}`,
+  `A ${R} ${R} 0 0 1 ${R} 0`,
+  'Z'
+].join(' ');
+
+class Component extends DCLogic {
+  state = { escala: 1, rx: 0, ry: 0, ativo: false };
+
+  componentDidMount() {
+    this.medir();
+    this._ro = new ResizeObserver(() => this.medir());
+    if (this._medidor) this._ro.observe(this._medidor);
+  }
+
+  componentWillUnmount() {
+    if (this._ro) this._ro.disconnect();
+  }
+
+  medir() {
+    if (!this._medidor) return;
+    const w = this._medidor.clientWidth;
+    const escala = Math.min(1, w / W);
+    if (Math.abs(escala - this.state.escala) > 0.002) this.setState({ escala });
+  }
+
+  renderVals() {
+    const { escala, rx, ry, ativo } = this.state;
+    const valor = this.props.valor ?? 'R$ 1.000,00';
+
+    return {
+      valor,
+      valorCurto: this.props.valorCurto ?? 'R$ 1.000',
+      valorExtenso: this.props.valorExtenso ?? 'mil reais',
+      codigo: this.props.codigo ?? 'Nº 001',
+      dataValidade: this.props.dataValidade ?? 'VÁLIDO ATÉ A FESTA',
+
+      refMedidor: el => { this._medidor = el; if (el) this.medir(); },
+      refBrilho: el => { this._brilho = el; },
+
+      estiloEscala: `width:${W}px;height:${H}px;transform:scale(${escala});transform-origin:top center;margin-bottom:${Math.round((escala - 1) * H)}px`,
+
+      estiloTilt: [
+        'width:' + W + 'px;height:' + H + 'px;transform-style:preserve-3d;will-change:transform',
+        'transform:perspective(1400px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) scale(' + (ativo ? 1.015 : 1) + ')',
+        'transition:' + (ativo ? 'none' : 'transform 420ms cubic-bezier(0.22,1,0.36,1)')
+      ].join(';'),
+
+      estiloCartao: `position:relative;width:${W}px;height:${H}px;color:#2B1A18;clip-path:path('${CLIP}');filter:drop-shadow(0 34px 60px rgba(20,2,6,0.62))`,
+
+      aoMover: e => {
+        const r = e.currentTarget.getBoundingClientRect();
+        const dx = (e.clientX - r.left) / r.width - 0.5;
+        const dy = (e.clientY - r.top) / r.height - 0.5;
+        this.setState({ ativo: true, rx: -dy * 2 * 7, ry: dx * 2 * 7 });
+        if (this._brilho) {
+          this._brilho.style.transition = 'none';
+          this._brilho.style.background = `radial-gradient(38% 55% at ${(dx + 0.5) * 100}% ${(dy + 0.5) * 100}%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0) 70%)`;
+        }
+      },
+
+      aoSair: () => {
+        this.setState({ ativo: false, rx: 0, ry: 0 });
+        if (this._brilho) {
+          this._brilho.style.transition = 'background 420ms ease-out';
+          this._brilho.style.background = 'transparent';
+        }
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

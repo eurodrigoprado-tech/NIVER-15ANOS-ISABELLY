@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cinzel:wght@400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #5E1018; }
+  a { color: #8C1F2C; text-decoration: none; }
+  a:hover { color: #5E1018; text-decoration: underline; }
+  * { box-sizing: border-box; }
+  ::selection { background: #E8D5A9; }
+  @keyframes desfileLooks { from { transform: translateX(0); } to { transform: translateX(-768px); } }
+</style>
+</helmet>
+<div style="min-height:100vh;background:radial-gradient(120% 80% at 50% 0%,#8A1C26 0%,#6B131C 45%,#4A0C13 100%);background-attachment:fixed;color:#2B1A18;font-family:'Cormorant Garamond',Georgia,serif;padding:0 16px 0">
+
+  <div style="max-width:720px;margin:0 auto;padding:40px 0 8px;text-align:center">
+    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.3em;color:#E0C484">FALTAM</div>
+    <div style="margin-top:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:18px">
+      <sc-for list="{{ contagem }}" as="c" hint-placeholder-count="4">
+        <div style="position:relative;width:104px;height:104px;display:flex;align-items:center;justify-content:center">
+          <div style="{{ c.estiloAnel }}"></div>
+          <div style="position:relative;text-align:center">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:32px;line-height:1;color:#FBEFD3">{{ c.valor }}</div>
+            <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:0.18em;color:#E0C484;margin-top:5px">{{ c.rotulo }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="max-width:720px;margin:0 auto;position:relative;padding:34px 0 0">
+
+    <div style="background:linear-gradient(176deg,#FBF6EA 0%,#F4EBD9 100%);border-radius:50% 50% 3px 3px / 13% 13% 0 0;padding:52px 30px 40px;box-shadow:0 40px 90px rgba(28,4,8,0.55),0 2px 0 rgba(255,255,255,0.5) inset;position:relative">
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:30px">
+        <div style="height:1px;flex:1;max-width:110px;background:linear-gradient(to right,transparent,#C19A4B)"></div>
+        <div style="width:7px;height:7px;transform:rotate(45deg);background:#C19A4B"></div>
+        <div style="height:1px;flex:1;max-width:110px;background:linear-gradient(to left,transparent,#C19A4B)"></div>
+      </div>
+
+      <div style="text-align:center">
+        <div style="font-family:'Cinzel',serif;font-weight:500;font-size:clamp(15px,3.4vw,21px);letter-spacing:0.18em;color:#3A2320">LISTA DE PRESENTES</div>
+        <h1 style="font-family:'Pinyon Script',cursive;font-weight:400;font-size:clamp(54px,13vw,96px);line-height:1.15;margin:6px 0 0;color:#8C1F2C;letter-spacing:0.01em">Isabelly</h1>
+        <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(18px,4vw,23px);color:#5A413C;margin-top:12px">quinze anos</div>
+      </div>
+
+      <div style="margin:30px auto 0;max-width:460px;position:relative">
+        <div style="border:1px solid #C9A863;padding:6px;background:#FFFBF1">
+          <img src="uploads/BAN001.jpg" alt="Isabelly" style="display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:52% 24%"/>
+        </div>
+      </div>
+
+      <p style="max-width:430px;margin:30px auto 0;text-align:center;font-size:clamp(17px,3.6vw,19px);line-height:1.6;color:#4A322E;text-wrap:pretty">Sua presença já é o maior presente. Mas se quiser deixar uma lembrança desse dia, separei algumas sugestões com carinho. Escolha uma e reserve — assim ninguém repete.</p>
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin:34px 0 0">
+        <div style="height:1px;flex:1;background:linear-gradient(to right,transparent,#C19A4B)"></div>
+        <div style="width:6px;height:6px;transform:rotate(45deg);background:#C19A4B"></div>
+        <div style="height:1px;flex:1;background:linear-gradient(to left,transparent,#C19A4B)"></div>
+      </div>
+
+      <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:0.24em;color:#7B5A2E;text-align:center;margin-top:28px">O MAIOR PRESENTE</div>
+      <p style="max-width:410px;margin:12px auto 0;text-align:center;font-family:'Cormorant Garamond',serif;font-size:19px;line-height:1.6;color:#4A322E;text-wrap:pretty">Um vale único, de mil reais, que cobre qualquer item da lista — ou ajuda a realizar o que a Isabelly mais quer.</p>
+
+      <div ref="{{ refMedidor }}" style="margin-top:12px;padding:26px 34px 34px;display:flex;justify-content:center;overflow:visible">
+        <div style="{{ estiloEscala }}">
+          <div ref="{{ refTilt }}" onMouseMove="{{ aoMover }}" onMouseLeave="{{ aoSair }}" style="width:741px;height:425px;transform-style:preserve-3d;will-change:transform;transform:perspective(1400px)">
+          <div style="{{ estiloCartao }}">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,#FDF8EC 0%,#F6EDDA 42%,#EFE2C8 100%)"></div>
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(193,154,75,0.055) 0 2px,transparent 2px 6px)"></div>
+            <div style="position:absolute;inset:0;background:radial-gradient(70% 90% at 78% 18%,rgba(255,255,255,0.75) 0%,rgba(255,255,255,0) 60%)"></div>
+            <div style="position:absolute;left:562px;top:0;width:2px;height:425px;background:repeating-linear-gradient(to bottom,rgba(140,31,44,0.4) 0 9px,transparent 9px 18px)"></div>
+            <div style="position:absolute;left:562px;top:0;width:179px;height:425px;background:linear-gradient(180deg,rgba(140,31,44,0.07),rgba(140,31,44,0.02))"></div>
+            <div style="position:absolute;left:32px;top:24px;width:498px;height:377px;border:1px solid rgba(193,154,75,0.75)"></div>
+            <div style="position:absolute;left:37px;top:29px;width:488px;height:367px;border:1px solid rgba(193,154,75,0.35)"></div>
+            <div style="position:absolute;left:64px;top:52px;width:434px;display:flex;align-items:center;gap:12px">
+              <div style="height:1px;flex:1;background:linear-gradient(to right,transparent,#C19A4B)"></div>
+              <div style="width:6px;height:6px;transform:rotate(45deg);background:#C19A4B"></div>
+              <div style="height:1px;flex:1;background:linear-gradient(to left,transparent,#C19A4B)"></div>
+            </div>
+            <div style="position:absolute;left:64px;top:76px;width:434px;text-align:center;font-family:'Cinzel',serif;font-size:17px;font-weight:500;letter-spacing:0.3em;color:#7B5A2E">VALE-PRESENTE</div>
+            <div style="position:absolute;left:52px;top:112px;width:458px;text-align:center;font-family:'Cinzel',serif;font-weight:700;font-size:56px;line-height:1;color:#8C1F2C;white-space:nowrap">{{ valorVale }}</div>
+            <div style="position:absolute;left:64px;top:180px;width:434px;text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:#5A4030">{{ valorValeExtenso }}</div>
+            <div style="position:absolute;left:150px;top:216px;width:262px;display:flex;align-items:center;gap:12px">
+              <div style="height:1px;flex:1;background:linear-gradient(to right,transparent,#C19A4B)"></div>
+              <div style="width:5px;height:5px;transform:rotate(45deg);background:#C19A4B"></div>
+              <div style="height:1px;flex:1;background:linear-gradient(to left,transparent,#C19A4B)"></div>
+            </div>
+            <div style="position:absolute;left:64px;top:244px;width:434px;text-align:center;font-family:'Cinzel',serif;font-size:26px;font-weight:600;letter-spacing:0.12em;color:#2B1A18">ISABELLY</div>
+            <div style="position:absolute;left:64px;top:284px;width:434px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:19px;letter-spacing:0.1em;color:#6B534E">FESTA DE 15 ANOS</div>
+            <div style="position:absolute;left:64px;top:350px;width:434px;display:flex;justify-content:space-between;align-items:flex-end;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.16em;color:#9A7B4A">
+              <div>Nº 001</div>
+              <div>VÁLIDO ATÉ A FESTA</div>
+            </div>
+            <div style="position:absolute;left:562px;top:0;width:179px;height:425px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">
+              <div style="width:7px;height:7px;transform:rotate(45deg);background:#C19A4B"></div>
+              <div style="writing-mode:vertical-rl;font-family:'Cinzel',serif;font-weight:600;font-size:40px;letter-spacing:0.18em;color:#8C1F2C">PRESENTE</div>
+              <div style="width:7px;height:7px;transform:rotate(45deg);background:#C19A4B"></div>
+            </div>
+            <div style="position:absolute;left:562px;top:22px;width:179px;text-align:center;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.22em;color:#A9855A">CANHOTO</div>
+            <div style="position:absolute;left:562px;bottom:22px;width:179px;text-align:center;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.22em;color:#A9855A">{{ valorValeCurto }}</div>
+            <div ref="{{ refBrilho }}" style="position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 500ms ease-out;background:radial-gradient(42% 60% at 50% 50%,rgba(255,255,255,0.85) 0%,rgba(255,244,214,0.35) 38%,rgba(255,255,255,0) 72%);mix-blend-mode:soft-light"></div>
+            <div ref="{{ refFaixa }}" style="position:absolute;top:-40%;left:-60%;width:38%;height:180%;pointer-events:none;opacity:0;transition:opacity 500ms ease-out;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,250,232,0.55) 45%,rgba(214,176,96,0.35) 55%,rgba(255,255,255,0) 100%);transform:rotate(18deg)"></div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <p style="max-width:430px;margin:18px auto 0;text-align:center;font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.55;color:#6B534E">Leve o vale impresso no dia da festa.</p>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:46px 0 26px">
+      <div style="height:1px;flex:1;max-width:140px;background:linear-gradient(to right,transparent,rgba(224,196,132,0.8))"></div>
+      <div style="width:7px;height:7px;transform:rotate(45deg);background:#E0C484"></div>
+      <div style="height:1px;flex:1;max-width:140px;background:linear-gradient(to left,transparent,rgba(224,196,132,0.8))"></div>
+    </div>
+
+    <h2 style="font-family:'Cinzel',serif;font-weight:500;font-size:clamp(17px,3.8vw,23px);letter-spacing:0.2em;color:#F6E7C6;text-align:center;margin:0">SUGESTÕES</h2>
+
+    <nav style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px">
+      <sc-for list="{{ filtros }}" as="f" hint-placeholder-count="3">
+        <button onClick="{{ f.aoClicar }}" style="{{ f.estilo }}">{{ f.rotulo }}</button>
+      </sc-for>
+    </nav>
+  </div>
+
+  <main style="max-width:760px;margin:30px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:22px;align-items:stretch">
+    <sc-for list="{{ presentesVisiveis }}" as="p" hint-placeholder-count="8">
+      <article style="background:linear-gradient(176deg,#FBF6EA 0%,#F4EBD9 100%);border-radius:50% 50% 2px 2px / 7% 7% 0 0;padding:14px 14px 20px;display:flex;flex-direction:column;box-shadow:0 14px 34px rgba(28,4,8,0.42)">
+        <div style="border:1px solid #D8BC85;padding:4px;background:#FFFBF1">
+          <div style="aspect-ratio:4/3;background:repeating-linear-gradient(135deg,#F0E4CB 0 8px,#F8F0DF 8px 16px);display:flex;align-items:center;justify-content:center">
+            <span style="font-family:ui-monospace,monospace;font-size:9.5px;letter-spacing:0.12em;color:#A9915F;text-transform:uppercase">foto do presente</span>
+          </div>
+        </div>
+        <div style="padding:14px 6px 0;display:flex;flex-direction:column;gap:7px;flex:1;text-align:center">
+          <div style="font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:0.2em;color:#A9855A">{{ p.categoria }}</div>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:21px;line-height:1.2;margin:0;min-height:50px;display:flex;align-items:center;justify-content:center;color:#2B1A18;text-wrap:pretty">{{ p.nome }}</h3>
+          <div style="font-size:18px;color:#8C1F2C">{{ p.preco }}</div>
+          <div style="flex:1"></div>
+          <sc-if value="{{ p.livre }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ p.aoReservar }}" style="width:100%;margin-top:10px;font-family:'Cinzel',serif;font-size:11px;font-weight:500;letter-spacing:0.18em;padding:12px 8px;border:1px solid #C9A863;background:transparent;color:#5A413C;cursor:pointer;transition:all .18s" style-hover="border-color:#8C1F2C;background:#8C1F2C;color:#FBF6EA">RESERVAR</button>
+          </sc-if>
+          <sc-if value="{{ p.reservado }}">
+            <div style="margin-top:10px;border-top:1px solid #E0CDA4;padding-top:11px">
+              <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:#8C1F2C">{{ p.textoReserva }}</div>
+              <button onClick="{{ p.aoCancelar }}" style="margin-top:5px;font-family:'Cormorant Garamond',serif;font-size:14px;padding:0;border:0;background:none;color:#9A8163;cursor:pointer;text-decoration:underline">cancelar reserva</button>
+            </div>
+          </sc-if>
+        </div>
+      </article>
+    </sc-for>
+  </main>
+
+  <section ref="{{ refMedidorConvite }}" style="max-width:640px;margin:78px auto 0;padding:0 20px;display:flex;justify-content:center">
+    <div style="{{ estiloEscalaConvite }}">
+      <div style="position:relative;width:600px;height:1256px;background:linear-gradient(176deg,#FDF9EF 0%,#F7EFDD 52%,#F1E6CE 100%);border-radius:3px;box-shadow:0 34px 76px rgba(18,2,6,0.5);color:#2B1A18;overflow:hidden">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(193,154,75,0.05) 0 2px,transparent 2px 7px);pointer-events:none"></div>
+        <div style="position:absolute;inset:18px;border:1px solid rgba(193,154,75,0.7);pointer-events:none;z-index:3"></div>
+        <div style="position:absolute;inset:24px;border:1px solid rgba(193,154,75,0.3);pointer-events:none;z-index:3"></div>
+
+        <img src="uploads/14f68b9c-7857-4e9f-a5da-ad3603157541.png" alt="Monograma IB" style="position:absolute;top:56px;left:236px;width:128px;height:133px;object-fit:contain"/>
+
+        <div style="position:absolute;top:252px;left:0;width:600px;text-align:center;font-family:'Cinzel',serif;font-size:12px;letter-spacing:0.3em;color:#7B5A2E">OS PAIS</div>
+
+        <div style="position:absolute;top:284px;left:50px;width:500px;text-align:center;font-family:'Cinzel',serif;font-size:13px;line-height:1.55;letter-spacing:0.02em;color:#2B1A18;text-wrap:pretty">KAROLLINA OLIVEIRA BITENCOURT E LÉO BITENCOURT DOS SANTOS, JUNTAMENTE COM A IRMÃ RAFAELLA OLIVEIRA BITENCOURT</div>
+
+        <div style="position:absolute;top:388px;left:0;width:600px;text-align:center;font-family:'Cinzel',serif;font-size:12.5px;letter-spacing:0.1em;color:#5A4030">CONVIDAM PARA O ANIVERSÁRIO DE 15 ANOS</div>
+
+        <div style="position:absolute;top:438px;left:0;width:600px;text-align:center;font-family:'Pinyon Script',cursive;font-size:70px;line-height:1.15;color:#8C1F2C">Isabelly Bitencourt</div>
+
+        <div style="position:absolute;top:604px;left:52px;width:496px;display:grid;grid-template-columns:1fr 1.9fr 1fr;align-items:stretch">
+          <div style="text-align:center;padding:0 10px">
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.26em;color:#A9855A">DATA</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:38px;line-height:1;color:#2B1A18;margin-top:12px;min-height:38px;display:flex;align-items:center;justify-content:center">03</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.25;color:#5A4030;margin-top:6px">outubro<br/>2026</div>
+          </div>
+          <div style="text-align:center;padding:0 14px;border-left:1px solid rgba(193,154,75,0.65);border-right:1px solid rgba(193,154,75,0.65)">
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.26em;color:#A9855A">LOCAL</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:23px;line-height:1;color:#2B1A18;margin-top:12px;min-height:38px;display:flex;align-items:center;justify-content:center">Tropical Village</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.4;color:#5A4030;margin-top:6px;white-space:nowrap">Rua Caracas - Setor Andreia<br/>Goiânia - GO, 74354-540</div>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=Tropical+Village+Rua+Caracas+Setor+Andreia+Goiania+GO+74354-540" target="_blank" rel="noopener" style="display:inline-block;margin-top:14px;font-family:'Cinzel',serif;font-size:10.5px;font-weight:500;letter-spacing:0.18em;padding:10px 20px;border:1px solid #8C1F2C;color:#8C1F2C;text-decoration:none;transition:all .18s" style-hover="background:#8C1F2C;color:#FDF9EF">VER NO MAPA</a>
+          </div>
+          <div style="text-align:center;padding:0 10px">
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.26em;color:#A9855A">HORÁRIO</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:38px;line-height:1;color:#2B1A18;margin-top:12px;min-height:38px;display:flex;align-items:center;justify-content:center">21</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.25;color:#5A4030;margin-top:6px">horas</div>
+          </div>
+        </div>
+
+        <div style="position:absolute;top:812px;left:0;width:600px;text-align:center;font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.26em;color:#7B5A2E">TRAJE</div>
+        <div style="position:absolute;top:836px;left:0;width:600px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:23px;letter-spacing:0.03em;color:#2B1A18">All Black</div>
+        <div style="position:absolute;top:876px;left:0;width:600px;overflow:hidden">
+          <div style="display:flex;gap:16px;width:max-content;animation:desfileLooks 22s linear infinite">
+            <div style="width:240px;flex:none">
+              <img src="uploads/pasted-1790045891063-0.png" alt="Traje All Black — look 1" style="display:block;width:100%;aspect-ratio:3/4;object-fit:cover"/>
+            </div>
+            <div style="width:240px;flex:none">
+              <img src="uploads/pasted-1790046113325-0.png" alt="Traje All Black — look 2" style="display:block;width:100%;aspect-ratio:3/4;object-fit:cover"/>
+            </div>
+            <div style="width:240px;flex:none">
+              <img src="uploads/pasted-1790046457980-0.png" alt="Traje All Black — look 3" style="display:block;width:100%;aspect-ratio:3/4;object-fit:cover"/>
+            </div>
+            <div style="width:240px;flex:none" aria-hidden="true">
+              <img src="uploads/pasted-1790045891063-0.png" alt="" style="display:block;width:100%;aspect-ratio:3/4;object-fit:cover"/>
+            </div>
+            <div style="width:240px;flex:none" aria-hidden="true">
+              <img src="uploads/pasted-1790046113325-0.png" alt="" style="display:block;width:100%;aspect-ratio:3/4;object-fit:cover"/>
+            </div>
+            <div style="width:240px;flex:none" aria-hidden="true">
+              <img src="uploads/pasted-1790046457980-0.png" alt="" style="display:block;width:100%;aspect-ratio:3/4;object-fit:cover"/>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <footer style="max-width:560px;margin:0 auto;padding:70px 0 72px;text-align:center">
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:26px">
+      <div style="height:1px;flex:1;background:linear-gradient(to right,transparent,rgba(224,196,132,0.8))"></div>
+      <div style="width:7px;height:7px;transform:rotate(45deg);background:#E0C484"></div>
+      <div style="height:1px;flex:1;background:linear-gradient(to left,transparent,rgba(224,196,132,0.8))"></div>
+    </div>
+    <p style="font-family:'Cinzel',serif;font-size:clamp(15px,3.4vw,19px);letter-spacing:0.14em;color:#F6E7C6;line-height:1.7;margin:0">OBRIGADA POR FAZER PARTE<br/>DESSE DIA COMIGO</p>
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:#E4BFBF;margin:18px 0 0">As reservas ficam salvas neste aparelho.</p>
+  </footer>
+
+  <sc-if value="{{ modalAberto }}">
+    <div onClick="{{ fecharModal }}" style="position:fixed;inset:0;background:rgba(30,5,9,0.66);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50">
+      <div onClick="{{ pararPropagacao }}" style="background:linear-gradient(176deg,#FBF6EA 0%,#F4EBD9 100%);border-radius:50% 50% 3px 3px / 10% 10% 0 0;max-width:400px;width:100%;padding:40px 32px 34px;text-align:center;box-shadow:0 30px 70px rgba(20,2,6,0.6)">
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px">
+          <div style="height:1px;flex:1;max-width:70px;background:linear-gradient(to right,transparent,#C19A4B)"></div>
+          <div style="width:6px;height:6px;transform:rotate(45deg);background:#C19A4B"></div>
+          <div style="height:1px;flex:1;max-width:70px;background:linear-gradient(to left,transparent,#C19A4B)"></div>
+        </div>
+        <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.22em;color:#A9855A">RESERVAR PRESENTE</div>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:27px;margin:12px 0 22px;line-height:1.2;color:#2B1A18">{{ nomePresenteModal }}</h3>
+        <input value="{{ nomeConvidado }}" onChange="{{ aoDigitarNome }}" placeholder="Seu nome" style="width:100%;font-family:'Cormorant Garamond',serif;font-size:19px;padding:13px 16px;border:1px solid #C9A863;background:#FFFBF1;color:#2B1A18;outline:none;text-align:center"/>
+        <div style="display:flex;gap:10px;margin-top:20px">
+          <button onClick="{{ fecharModal }}" style="flex:1;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.16em;padding:13px 8px;border:1px solid #C9A863;background:transparent;color:#6B534E;cursor:pointer">VOLTAR</button>
+          <button onClick="{{ confirmarReserva }}" style="flex:1;font-family:'Cinzel',serif;font-size:11px;letter-spacing:0.16em;padding:13px 8px;border:1px solid #8C1F2C;background:#8C1F2C;color:#FBF6EA;cursor:pointer">CONFIRMAR</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;chavePix&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;(11) 90000-0000&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pix&quot;},&quot;nomeTitular&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Isabelly — chave celular&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Pix&quot;},&quot;valorVale&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;R$ 1.000,00&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vale-presente&quot;},&quot;valorValeCurto&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;R$ 1.000&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vale-presente&quot;},&quot;valorValeExtenso&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;mil reais&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vale-presente&quot;},&quot;permitirReserva&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamento&quot;},&quot;mostrarPreco&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamento&quot;}}">
+const KEY = 'isabelly15_reservas_v1';
+
+const PRESENTES = [
+  { id: 'g01', nome: 'Fone de ouvido bluetooth', categoria: 'TECNOLOGIA', preco: 'R$ 100' },
+  { id: 'g02', nome: 'Kit de skincare facial', categoria: 'BELEZA', preco: 'R$ 100' },
+  { id: 'g03', nome: 'Colar delicado folheado', categoria: 'ACESSÓRIOS', preco: 'R$ 80' }
+];
+
+const BASE = 'font-family:Cinzel,serif;font-size:11px;font-weight:500;letter-spacing:0.18em;padding:11px 22px;cursor:pointer;transition:all .18s;border:1px solid ';
+
+class Component extends DCLogic {
+  state = { reservas: {}, filtro: 'todos', modal: null, nome: '', copiado: false, escala: 1, escalaConvite: 1, rx: 0, ry: 0, tiltAtivo: false };
+
+  componentDidMount() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) this.setState({ reservas: JSON.parse(raw) });
+    } catch (e) {}
+    this._tick = setInterval(() => this.setState({ agora: Date.now() }), 1000);
+    this.medir();
+    this._ro = new ResizeObserver(() => this.medir());
+    if (this._medidor) this._ro.observe(this._medidor);
+    if (this._medidorConvite) this._ro.observe(this._medidorConvite);
+  }
+
+  componentWillUnmount() {
+    if (this._ro) this._ro.disconnect();
+    if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._tick) clearInterval(this._tick);
+  }
+
+  anel(fracao) {
+    const g = Math.max(0, Math.min(1, fracao)) * 360;
+    return 'position:absolute;inset:0;border-radius:50%;background:conic-gradient(#E0C484 0deg ' + g.toFixed(1) + 'deg,rgba(224,196,132,0.2) ' + g.toFixed(1) + 'deg 360deg);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 5px));mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 5px))';
+  }
+
+  iniciarLoop() {
+    if (this._raf) return;
+    this._pos = this._pos || { x: 0, y: 0, k: 0 };
+    const passo = () => {
+      const alvo = this._alvo;
+      const p = this._pos;
+      const ax = alvo ? alvo.x : 0;
+      const ay = alvo ? alvo.y : 0;
+      const ak = alvo ? 1 : 0;
+      p.x += (ax - p.x) * 0.12;
+      p.y += (ay - p.y) * 0.12;
+      p.k += (ak - p.k) * 0.09;
+
+      const parado = Math.abs(ax - p.x) < 0.0008 && Math.abs(ay - p.y) < 0.0008 && Math.abs(ak - p.k) < 0.004;
+      if (parado) { p.x = ax; p.y = ay; p.k = ak; }
+
+      if (this._tilt) {
+        this._tilt.style.transform =
+          'perspective(1400px) rotateX(' + (-p.y * 15) + 'deg) rotateY(' + (p.x * 15) + 'deg) scale(' + (1 + 0.018 * p.k) + ')';
+      }
+      if (this._brilho) {
+        this._brilho.style.transition = 'none';
+        this._brilho.style.opacity = String(p.k);
+        this._brilho.style.transform = 'translate(' + (p.x * 34) + '%,' + (p.y * 34) + '%)';
+      }
+      if (this._faixa) {
+        this._faixa.style.transition = 'none';
+        this._faixa.style.opacity = String(0.85 * p.k);
+        this._faixa.style.transform = 'rotate(18deg) translateX(' + (150 + p.x * 240) + '%)';
+      }
+
+      if (parado) { this._raf = null; return; }
+      this._raf = requestAnimationFrame(passo);
+    };
+    this._raf = requestAnimationFrame(passo);
+  }
+
+  medir() {
+    const s = {};
+    if (this._medidor) {
+      const e = Math.min(1, Math.max(120, this._medidor.clientWidth - 68) / 741);
+      if (Math.abs(e - this.state.escala) > 0.002) s.escala = e;
+    }
+    if (this._medidorConvite) {
+      const e = Math.min(1, Math.max(120, this._medidorConvite.clientWidth - 40) / 600);
+      if (Math.abs(e - this.state.escalaConvite) > 0.002) s.escalaConvite = e;
+    }
+    if (Object.keys(s).length) this.setState(s);
+  }
+
+  salvar(reservas) {
+    this.setState({ reservas });
+    try { localStorage.setItem(KEY, JSON.stringify(reservas)); } catch (e) {}
+  }
+
+  renderVals() {
+    const { reservas, filtro, modal, nome, copiado } = this.state;
+    const permitir = this.props.permitirReserva ?? true;
+    const mostrarPreco = this.props.mostrarPreco ?? true;
+    const chavePix = this.props.chavePix ?? '(11) 90000-0000';
+
+    const lista = PRESENTES.map(p => {
+      const dono = reservas[p.id];
+      return {
+        id: p.id,
+        nome: p.nome,
+        categoria: p.categoria,
+        preco: mostrarPreco ? p.preco : '',
+        livre: !dono && permitir,
+        reservado: !!dono,
+        textoReserva: dono ? 'Reservado por ' + dono : '',
+        aoReservar: () => this.setState({ modal: p.id, nome: '' }),
+        aoCancelar: () => {
+          const r = Object.assign({}, reservas);
+          delete r[p.id];
+          this.salvar(r);
+        }
+      };
+    });
+
+    const visiveis = lista.filter(p =>
+      filtro === 'todos' ? true : filtro === 'disponiveis' ? !p.reservado : p.reservado
+    );
+
+    const defs = [
+      { k: 'todos', r: 'TODOS' },
+      { k: 'disponiveis', r: 'DISPONÍVEIS' },
+      { k: 'reservados', r: 'JÁ RESERVADOS' }
+    ];
+
+    const filtros = defs.map(d => ({
+      rotulo: d.r,
+      estilo: BASE + (filtro === d.k ? '#E0C484;background:#F6E7C6;color:#5E1018' : 'rgba(224,196,132,0.55);background:transparent;color:#F1DDB9'),
+      aoClicar: () => this.setState({ filtro: d.k })
+    }));
+
+    const pModal = PRESENTES.find(p => p.id === modal);
+
+    const esc = this.state.escala;
+    const CLIP = "M 25 0 L 541 0 A 21 21 0 0 0 583 0 L 716 0 A 25 25 0 0 1 741 25 L 741 400 A 25 25 0 0 1 716 425 L 583 425 A 21 21 0 0 0 541 425 L 25 425 A 25 25 0 0 1 0 400 L 0 25 A 25 25 0 0 1 25 0 Z";
+
+    const alvo = new Date('2026-10-03T21:00:00-03:00').getTime();
+    const resta = Math.max(0, alvo - (this.state.agora || Date.now()));
+    const seg = Math.floor(resta / 1000);
+    const dias = Math.floor(seg / 86400);
+    const horas = Math.floor((seg % 86400) / 3600);
+    const mins = Math.floor((seg % 3600) / 60);
+    const segs = seg % 60;
+    const pad = n => String(n).padStart(2, '0');
+    const contagem = [
+      { valor: pad(dias), rotulo: 'DIAS', estiloAnel: this.anel(Math.min(1, dias / 60)) },
+      { valor: pad(horas), rotulo: 'HORAS', estiloAnel: this.anel(horas / 24) },
+      { valor: pad(mins), rotulo: 'MINUTOS', estiloAnel: this.anel(mins / 60) },
+      { valor: pad(segs), rotulo: 'SEGUNDOS', estiloAnel: this.anel(segs / 60) }
+    ];
+
+    return {
+      contagem,
+      refMedidor: el => { this._medidor = el; if (el) this.medir(); },
+      refMedidorConvite: el => { this._medidorConvite = el; if (el) this.medir(); },
+      estiloEscalaConvite: 'width:600px;height:1256px;transform:scale(' + this.state.escalaConvite + ');transform-origin:top center;margin-bottom:' + Math.round((this.state.escalaConvite - 1) * 1256) + 'px',
+      refBrilho: el => { this._brilho = el; },
+      refFaixa: el => { this._faixa = el; },
+      refTilt: el => { this._tilt = el; },
+      estiloEscala: 'width:741px;height:425px;transform:scale(' + esc + ');transform-origin:top center;margin-bottom:' + Math.round((esc - 1) * 425) + 'px',
+      aoMover: e => {
+        const r = e.currentTarget.getBoundingClientRect();
+        this._alvo = {
+          x: (e.clientX - r.left) / r.width - 0.5,
+          y: (e.clientY - r.top) / r.height - 0.5
+        };
+        this.iniciarLoop();
+      },
+      aoSair: () => {
+        this._alvo = null;
+        this.iniciarLoop();
+      },
+      estiloCartao: "position:relative;width:741px;height:425px;color:#2B1A18;clip-path:path('" + CLIP + "');filter:drop-shadow(0 18px 38px rgba(20,2,6,0.3))",
+      valorVale: this.props.valorVale ?? 'R$ 1.000,00',
+      valorValeCurto: this.props.valorValeCurto ?? 'R$ 1.000',
+      valorValeExtenso: this.props.valorValeExtenso ?? 'mil reais',
+      filtros,
+      presentesVisiveis: visiveis,
+      chavePix,
+      nomeTitular: this.props.nomeTitular ?? 'Isabelly — chave celular',
+      rotuloCopiar: copiado ? 'COPIADO!' : 'COPIAR CHAVE',
+      copiarPix: () => {
+        try { navigator.clipboard.writeText(chavePix); } catch (e) {}
+        this.setState({ copiado: true });
+        setTimeout(() => this.setState({ copiado: false }), 2000);
+      },
+      modalAberto: !!pModal,
+      nomePresenteModal: pModal ? pModal.nome : '',
+      nomeConvidado: nome,
+      aoDigitarNome: e => this.setState({ nome: e.target.value }),
+      pararPropagacao: e => e.stopPropagation(),
+      fecharModal: () => this.setState({ modal: null, nome: '' }),
+      confirmarReserva: () => {
+        const n = nome.trim();
+        if (!n || !modal) return;
+        const r = Object.assign({}, reservas);
+        r[modal] = n;
+        this.salvar(r);
+        this.setState({ modal: null, nome: '' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
